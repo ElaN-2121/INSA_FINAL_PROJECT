@@ -1,23 +1,23 @@
 export default function Table({ columns, data, onRowClick, emptyMessage = 'No records found.' }) {
   return (
-    <div className="overflow-x-auto border border-gray-200 rounded-lg">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+    <div className="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-sm">
+      <table className="min-w-full divide-y divide-slate-200">
+        <thead className="bg-slate-50 text-slate-500">
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.12em]"
               >
                 {col.label}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-8 text-center text-gray-500 text-sm">
+              <td colSpan={columns.length} className="px-4 py-10 text-center text-sm text-slate-500">
                 {emptyMessage}
               </td>
             </tr>
@@ -26,10 +26,12 @@ export default function Table({ columns, data, onRowClick, emptyMessage = 'No re
               <tr
                 key={row.id || rowIndex}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={onRowClick ? 'hover:bg-gray-50 cursor-pointer' : ''}
+                className={`transition-colors duration-150 ${
+                  rowIndex % 2 ? 'bg-slate-50' : 'bg-white'
+                } ${onRowClick ? 'hover:bg-slate-100 cursor-pointer' : ''}`}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className="px-4 py-3 text-sm text-gray-700 whitespace-nowrap">
+                  <td key={col.key} className="px-4 py-3 text-sm text-slate-700 whitespace-nowrap align-top">
                     {col.render ? col.render(row) : row[col.key]}
                   </td>
                 ))}

@@ -1,50 +1,83 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { Home, CheckCircle, MessageSquare, Bell, LogOut, UserCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import logo from '../assets/ethiocred-logo.png';
 
 const navLinks = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/credentials', label: 'My Credentials' },
-  { to: '/requests', label: 'Verification Requests' },
-  { to: '/notifications', label: 'Notifications' },
+  { to: '/dashboard', label: 'Dashboard', icon: <Home size={18} /> },
+  { to: '/credentials', label: 'My Credentials', icon: <CheckCircle size={18} /> },
+  { to: '/requests', label: 'Verification Requests', icon: <MessageSquare size={18} /> },
+  { to: '/notifications', label: 'Notifications', icon: <Bell size={18} /> },
 ];
 
 const linkClass = ({ isActive }) =>
-  `block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-    isActive ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+  `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 ${
+    isActive
+      ? 'bg-slate-100 text-slate-900 shadow-sm'
+      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
   }`;
 
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
+  const userName = user?.full_name || user?.email || 'User';
+  const firstName = userName.split(' ')[0];
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
-      <aside className="w-[250px] bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-100">
-          <h1 className="text-lg font-bold text-blue-700">EthioCred</h1>
-          <p className="text-xs text-gray-500 mt-1">User Wallet</p>
+    <div className="min-h-screen flex bg-slate-100 text-slate-900">
+      <aside className="w-[280px] shrink-0 bg-slate-950 text-slate-100 flex flex-col border-r border-slate-800">
+        <div className="px-6 py-5 border-b border-slate-800">
+          <div className="flex items-center gap-3">
+            <img
+              src={logo}
+              alt="EthioCred logo"
+              className="h-11 w-11 rounded-2xl border border-white/10 bg-white/10 object-cover"
+            />
+            <div>
+              <p className="text-lg font-semibold tracking-tight">EthioCred</p>
+              <p className="text-xs text-slate-400">User Wallet</p>
+            </div>
+          </div>
         </div>
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 px-3 py-5 space-y-2">
           {navLinks.map((link) => (
             <NavLink key={link.to} to={link.to} className={linkClass}>
-              {link.label}
+              <span className="text-slate-300">{link.icon}</span>
+              <span>{link.label}</span>
             </NavLink>
           ))}
         </nav>
+        <div className="px-6 py-5 border-t border-slate-800">
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 p-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-800 text-slate-200">
+              <UserCircle size={20} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-slate-100">{firstName}</p>
+              <p className="text-xs text-slate-500">Wallet User</p>
+            </div>
+          </div>
+        </div>
       </aside>
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-700">
-            {user?.full_name || user?.email}
-          </span>
-          <button
-            type="button"
-            onClick={logout}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors"
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
+        <header className="bg-white border-b border-slate-200 px-6 py-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-slate-500">Welcome back</p>
+            <h1 className="text-2xl font-semibold text-slate-900">Hello, {firstName}.</h1>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 px-4 py-2">
+              <UserCircle size={20} className="text-slate-500" />
+              <div className="text-sm text-slate-700 font-medium truncate">{userName}</div>
+            </div>
+            <button
+              type="button"
+              onClick={logout}
+              className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <LogOut size={16} />
+              Logout
+            </button>
+          </div>
         </header>
         <main className="flex-1 p-6 overflow-auto">
           <Outlet />

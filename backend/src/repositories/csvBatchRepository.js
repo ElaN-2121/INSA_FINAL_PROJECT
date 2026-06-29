@@ -2,12 +2,11 @@ const { query } = require('../config/database');
 
 async function createBatch({ institutionId, uploadedBy, filename, fileData, totalRecords }, client = null) {
   const db = client || { query };
-  const result = await db.query(
-    `INSERT INTO csv_batches (institution_id, uploaded_by, filename, file_data, total_records, status)
-     VALUES ($1, $2, $3, $4, $5, 'STAGED')
-     RETURNING *`,
-    [institutionId, uploadedBy, filename, fileData, totalRecords]
-  );
+const result = await query(
+  `INSERT INTO csv_batches (institution_id, uploaded_by, filename, file_data, total_records, status)
+   VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+  [institutionId, uploadedBy, filename, JSON.stringify(fileData), totalRecords, 'STAGED']
+);
   return result.rows[0];
 }
 

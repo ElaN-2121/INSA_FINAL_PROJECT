@@ -12,6 +12,8 @@ import StagingDashboard from '../pages/StagingDashboard/StagingDashboard.jsx';
 import IssuedCredentials from '../pages/IssuedCredentials/IssuedCredentials.jsx';
 import CredentialDetail from '../pages/CredentialDetail/CredentialDetail.jsx';
 import Settings from '../pages/Settings/Settings.jsx';
+import SecurityDemo from '../pages/Admin/SecurityDemo';
+
 
 const UNIVERSITY_ROLES = ['UNIVERSITY', 'ADMIN'];
 
@@ -49,6 +51,14 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
+        <Route
+          path="/admin/security"
+          element={
+            <ProtectedRoute role="ADMIN">
+              <SecurityDemo />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/upload" element={<UploadBatch />} />
         <Route path="/staging/:batchId" element={<StagingDashboard />} />

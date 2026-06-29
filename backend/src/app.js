@@ -12,6 +12,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const verificationRoutes = require('./routes/verificationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const { error } = require('./utils/apiResponse');
+const securityRoutes = require('./routes/securityRoutes');
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/credentials', credentialRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/verification', verificationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/security', securityRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });

@@ -111,49 +111,60 @@ export default function StagingDashboard() {
   }
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-2">Staging Dashboard</h2>
-      <p className="text-gray-500 mb-6">Review validated records before issuing credentials.</p>
+    <div className="space-y-6">
+      <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900">Staging Dashboard</h2>
+            <p className="mt-1 text-sm text-slate-500">Review validated records before issuing credentials.</p>
+          </div>
+          <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+            Batch ID: <span className="font-semibold text-slate-900">{batchId}</span>
+          </div>
+        </div>
+      </div>
 
       {invalidRows.length > 0 && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="rounded-[1.75rem] border border-amber-200 bg-amber-50 p-5 shadow-sm">
           <button
             type="button"
             onClick={() => setShowInvalid(!showInvalid)}
-            className="text-sm font-medium text-yellow-800 hover:text-yellow-900"
+            className="text-sm font-semibold text-amber-800 transition hover:text-amber-900"
           >
             {invalidRows.length} invalid row{invalidRows.length !== 1 ? 's' : ''} excluded —{' '}
             {showInvalid ? 'hide' : 'view'}
           </button>
+
           {showInvalid && (
-            <div className="mt-4">
+            <div className="mt-4 rounded-3xl border border-amber-100 bg-white p-4">
               <Table columns={invalidColumns} data={invalidRows} />
             </div>
           )}
         </div>
       )}
 
-      <div className="mb-6">
-        <p className="text-sm text-gray-600 mb-3">
-          <span className="font-semibold text-green-700">{validRows.length}</span> students ready for issuance
-        </p>
+      <div className="space-y-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-slate-600">
+            <span className="font-semibold text-emerald-700">{validRows.length}</span> students ready for issuance
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowConfirm(true)}
+            disabled={validRows.length === 0}
+            className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 transition hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Issue All Credentials
+          </button>
+        </div>
         <Table columns={columns} data={validRows} emptyMessage="No valid records in this batch." />
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+        <div className="rounded-3xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 shadow-sm">
           {error}
         </div>
       )}
-
-      <button
-        type="button"
-        onClick={() => setShowConfirm(true)}
-        disabled={validRows.length === 0}
-        className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-semibold text-lg"
-      >
-        Issue All Credentials
-      </button>
 
       <Modal
         isOpen={showConfirm}
@@ -162,9 +173,8 @@ export default function StagingDashboard() {
         onConfirm={handleIssue}
         confirmLabel="Confirm & Issue"
       >
-        <p>
-          You are about to issue <strong>{validRows.length}</strong> digitally signed credential
-          {validRows.length !== 1 ? 's' : ''} on behalf of <strong>{institutionName}</strong>.
+        <p className="text-sm leading-6 text-slate-700">
+          You are about to issue <strong>{validRows.length}</strong> digitally signed credential{validRows.length !== 1 ? 's' : ''} on behalf of <strong>{institutionName}</strong>.
           This action cannot be undone. Confirm?
         </p>
       </Modal>

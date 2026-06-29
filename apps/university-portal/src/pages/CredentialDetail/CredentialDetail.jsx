@@ -86,53 +86,58 @@ export default function CredentialDetail() {
   ];
 
   return (
-    <div>
+    <div className="space-y-6">
       <button
         type="button"
         onClick={() => navigate('/credentials')}
-        className="text-sm text-blue-600 hover:underline mb-4"
+        className="inline-flex items-center gap-2 text-sm font-medium text-slate-700 transition hover:text-slate-900"
       >
         ← Back to credentials
       </button>
 
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Credential Detail</h2>
-        {statusBadge(credential.status)}
-      </div>
-
-      {successMsg && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg">
-          {successMsg}
+      <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900">Credential Detail</h2>
+            <p className="mt-1 text-sm text-slate-500">Review credential metadata and signature details.</p>
+          </div>
+          {statusBadge(credential.status)}
         </div>
-      )}
 
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
-          {error}
-        </div>
-      )}
+        {successMsg && (
+          <div className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700 shadow-sm">
+            {successMsg}
+          </div>
+        )}
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {error && (
+          <div className="mt-6 rounded-3xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 shadow-sm">
+            {error}
+          </div>
+        )}
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
           {fields.map((f) => (
-            <div key={f.label}>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">{f.label}</p>
-              <p className="text-gray-800 font-medium mt-0.5">{f.value}</p>
+            <div key={f.label} className="rounded-3xl bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{f.label}</p>
+              <p className="mt-2 text-sm font-medium text-slate-900">{f.value}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-6 space-y-4">
-        <div>
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Credential Hash (SHA-256)</p>
-          <code className="text-xs text-gray-700 break-all font-mono">{credential.credential_hash}</code>
-        </div>
-        <div>
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Digital Signature</p>
-          <code className="text-xs text-gray-700 break-all font-mono">
-            {credential.digital_signature?.slice(0, 50)}...
-          </code>
+      <div className="rounded-[2rem] border border-slate-200 bg-slate-950 p-6 shadow-sm">
+        <div className="space-y-6 text-slate-100">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 mb-2">Credential Hash (SHA-256)</p>
+            <pre className="overflow-x-auto rounded-3xl bg-slate-900 p-4 text-xs font-mono text-emerald-300">{credential.credential_hash}</pre>
+          </div>
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400 mb-2">Digital Signature</p>
+            <pre className="overflow-x-auto rounded-3xl bg-slate-900 p-4 text-xs font-mono text-slate-300">
+              {credential.digital_signature?.slice(0, 50)}...
+            </pre>
+          </div>
         </div>
       </div>
 
@@ -140,7 +145,7 @@ export default function CredentialDetail() {
         <button
           type="button"
           onClick={() => setShowRevokeModal(true)}
-          className="px-6 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+          className="inline-flex items-center justify-center rounded-2xl bg-rose-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-500/10 transition hover:bg-rose-700"
         >
           Revoke This Credential
         </button>
@@ -148,19 +153,22 @@ export default function CredentialDetail() {
 
       <Modal
         isOpen={showRevokeModal}
-        onClose={() => { setShowRevokeModal(false); setReason(''); }}
+        onClose={() => {
+          setShowRevokeModal(false);
+          setReason('');
+        }}
         title="Revoke Credential"
         onConfirm={handleRevoke}
         confirmLabel={revoking ? 'Revoking...' : 'Confirm Revocation'}
         confirmVariant="danger"
         confirmDisabled={!reason.trim() || revoking}
       >
-        <p className="mb-3">Please provide a reason for revoking this credential.</p>
+        <p className="mb-3 text-sm text-slate-700">Please provide a reason for revoking this credential.</p>
         <textarea
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           rows={4}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+          className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-rose-500 focus:ring-2 focus:ring-rose-200"
           placeholder="Revocation reason (required)"
           required
         />

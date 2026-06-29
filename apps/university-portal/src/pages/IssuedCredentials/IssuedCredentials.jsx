@@ -112,20 +112,25 @@ export default function IssuedCredentials() {
   }
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Issued Credentials</h2>
-        <div className="w-full sm:w-72">
-          <SearchInput
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or serial..."
-          />
+    <div className="space-y-6">
+      <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900">Issued Credentials</h2>
+            <p className="mt-1 text-sm text-slate-500">Search, review, and revoke issued credentials.</p>
+          </div>
+          <div className="w-full sm:w-80">
+            <SearchInput
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name or serial..."
+            />
+          </div>
         </div>
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+        <div className="rounded-3xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 shadow-sm">
           {error}
         </div>
       )}
@@ -138,17 +143,16 @@ export default function IssuedCredentials() {
       />
 
       {filtered.length > PAGE_SIZE && (
-        <div className="flex items-center justify-between mt-4">
-          <p className="text-sm text-gray-500">
-            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of{' '}
-            {filtered.length}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-slate-500">
+            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
           </p>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1 text-sm border rounded-lg disabled:opacity-40"
+              className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 disabled:opacity-40"
             >
               Previous
             </button>
@@ -156,7 +160,7 @@ export default function IssuedCredentials() {
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-3 py-1 text-sm border rounded-lg disabled:opacity-40"
+              className="rounded-2xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 disabled:opacity-40"
             >
               Next
             </button>

@@ -54,13 +54,25 @@ async function getInstitutionCredentials(req, res) {
   return success(res, credentials, 'Institution credentials retrieved successfully');
 }
 
-async function getCredentialById(req, res) {
-  const credential = await credentialService.getCredentialWithDetails(req.params.id);
-  if (!credential) {
-    return error(res, 'Credential not found', 404);
+const getCredentialById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Validate it looks like a UUID before querying
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      return error(res, 'Invalid credential ID format', 400);
+    }
+
+    const credential = await credentialService.getCredentialWithDetails(id);
+    if (!credential) {
+      return error(res, 'Credential not found', 404);
+    }
+    return success(res, credential);
+  } catch (err) {
+    next(err);
   }
-  return success(res, credential, 'Credential retrieved successfully');
-}
+};
 
 async function revokeCredential(req, res) {
   const { reason } = req.body;

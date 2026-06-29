@@ -57,71 +57,81 @@ export default function Settings() {
   }
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Settings</h2>
+    <div className="space-y-6">
+      <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-200">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900">Settings</h2>
+            <p className="mt-1 text-sm text-slate-500">Manage your institution profile and registry credentials.</p>
+          </div>
+        </div>
+      </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+        <div className="rounded-3xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 shadow-sm">
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Institution</h3>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Institution</h3>
           {institution ? (
-            <dl className="space-y-3">
+            <dl className="space-y-4">
               <div>
-                <dt className="text-xs text-gray-500 uppercase">Name</dt>
-                <dd className="font-medium text-gray-800">{institution.name}</dd>
+                <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Name</dt>
+                <dd className="mt-1 text-base font-medium text-slate-900">{institution.name}</dd>
               </div>
               <div>
-                <dt className="text-xs text-gray-500 uppercase">Registration Number</dt>
-                <dd className="font-medium text-gray-800">{institution.registration_number || '-'}</dd>
+                <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Registration Number</dt>
+                <dd className="mt-1 text-base font-medium text-slate-900">{institution.registration_number || '-'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-gray-500 uppercase">Status</dt>
-                <dd className="mt-1">{statusBadge(institution.status)}</dd>
+                <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Status</dt>
+                <dd className="mt-2">{statusBadge(institution.status)}</dd>
               </div>
               <div>
-                <dt className="text-xs text-gray-500 uppercase">Approved At</dt>
-                <dd className="font-medium text-gray-800">
+                <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Approved At</dt>
+                <dd className="mt-1 text-base font-medium text-slate-900">
                   {institution.approved_at ? formatDateTime(institution.approved_at) : '-'}
                 </dd>
               </div>
             </dl>
           ) : (
-            <p className="text-gray-500">Institution data unavailable.</p>
+            <p className="text-slate-500">Institution data unavailable.</p>
           )}
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Registrar Profile</h3>
-          <dl className="space-y-3">
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Registrar Profile</h3>
+          <dl className="space-y-4">
             <div>
-              <dt className="text-xs text-gray-500 uppercase">Full Name</dt>
-              <dd className="font-medium text-gray-800">{user?.full_name || '-'}</dd>
+              <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Full Name</dt>
+              <dd className="mt-1 text-base font-medium text-slate-900">{user?.full_name || '-'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500 uppercase">Email</dt>
-              <dd className="font-medium text-gray-800">{user?.email || '-'}</dd>
+              <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Email</dt>
+              <dd className="mt-1 text-base font-medium text-slate-900">{user?.email || '-'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-500 uppercase">Role</dt>
-              <dd className="mt-1"><Badge variant="blue">{user?.role}</Badge></dd>
+              <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Role</dt>
+              <dd className="mt-2"><Badge variant="blue">{user?.role}</Badge></dd>
             </div>
           </dl>
         </div>
       </div>
 
-      <div className="mt-6 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-gray-800">Public Key (Trust Registry)</h3>
+      <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">Public Key (Trust Registry)</h3>
+            <p className="mt-1 text-sm text-slate-500">Use this public key to verify your institution's issued credentials.</p>
+          </div>
           {publicKey && (
             <button
               type="button"
               onClick={handleCopy}
-              className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700"
+              className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
             >
               {copied ? <Check size={16} /> : <Copy size={16} />}
               {copied ? 'Copied!' : 'Copy'}
@@ -129,11 +139,11 @@ export default function Settings() {
           )}
         </div>
         {publicKey ? (
-          <pre className="bg-gray-900 text-green-400 text-xs p-4 rounded-lg overflow-x-auto font-mono max-h-64">
+          <pre className="mt-5 max-h-64 overflow-x-auto rounded-3xl bg-slate-950 px-4 py-4 text-xs text-green-300 font-mono shadow-inner">
             {publicKey}
           </pre>
         ) : (
-          <p className="text-gray-500 text-sm">Public key not found in trust registry.</p>
+          <p className="mt-4 text-sm text-slate-500">Public key not found in trust registry.</p>
         )}
       </div>
     </div>

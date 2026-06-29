@@ -8,12 +8,17 @@ const { canonicalize, hashCredential } = require('../crypto/hash');
 const { verifySignature } = require('../crypto/verify');
 
 function formatIssueDate(date) {
-  if (!date) {
-    return '';
-  }
+  if (!date) return '';
+  
   if (date instanceof Date) {
-    return date.toISOString().split('T')[0];
+    // Extract date parts using LOCAL time, not UTC
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
+  
+  // Already a string like "2026-06-29" or "2026-06-29T00:00:00.000Z"
   return String(date).split('T')[0];
 }
 
@@ -33,7 +38,7 @@ function mapReasonToLogResult(reason) {
 function buildCanonicalObject(credential) {
   return {
     degree_name: credential.degree_name,
-    graduation_year: credential.graduation_year,
+    graduation_year: Number(credential.graduation_year),
     gpa: parseFloat(credential.gpa),
     holder_name: credential.holder_name,
     institution_name: credential.institution_name,
@@ -66,6 +71,7 @@ async function verifyCredential(credentialId) {
 
   const canonicalData = buildCanonicalObject(credential);
   const canonicalString = canonicalize(canonicalData);
+  console.log('VERIFICATION CANONICAL:', canonicalString);
   const computedHash = hashCredential(canonicalString);
 
   if (computedHash !== credential.credential_hash) {

@@ -96,6 +96,7 @@ async function issueBatch(batchId, registrarId) {
 
       const canonicalString = canonicalize(canonicalData);
       const credentialHash = hashCredential(canonicalString);
+      console.log('ISSUANCE CANONICAL:', canonicalString);
       const digitalSignature = signCredential(canonicalString, privateKey);
 
       const credential = await credentialRepository.createCredential(

@@ -72,21 +72,35 @@ export default function UploadBatch() {
   ];
 
   return (
-    <div>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Upload Graduation Batch</h2>
+    <div className="space-y-6">
+      <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-200">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-slate-900">Upload Graduation Batch</h2>
+            <p className="text-sm text-slate-500 mt-1">
+              Upload a CSV file containing student credentials for validation and issuance.
+            </p>
+          </div>
+        </div>
+      </div>
 
       <div
-        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragging(true);
+        }}
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         onClick={() => inputRef.current?.click()}
-        className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-colors ${
-          dragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white hover:border-blue-400'
-        }`}
+        className={`group rounded-[1.75rem] border-2 border-dashed p-12 text-center transition-all duration-200 ${
+          dragging
+            ? 'border-blue-500 bg-blue-50/80 shadow-sm'
+            : 'border-slate-300 bg-white hover:border-blue-400 hover:shadow-sm'
+        } cursor-pointer`}
       >
-        <Upload className="mx-auto text-gray-400 mb-4" size={48} />
-        <p className="text-gray-700 font-medium">Drag and drop your CSV file here</p>
-        <p className="text-gray-500 text-sm mt-1">or click to browse</p>
+        <Upload className="mx-auto text-slate-400 transition group-hover:text-blue-600" size={48} />
+        <p className="mt-4 text-lg font-semibold text-slate-900">Drag and drop your CSV file here</p>
+        <p className="mt-2 text-sm text-slate-500">or click to browse</p>
         <input
           ref={inputRef}
           type="file"
@@ -97,17 +111,17 @@ export default function UploadBatch() {
       </div>
 
       {file && (
-        <div className="mt-4 flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="flex flex-col gap-3 rounded-3xl border border-slate-200 bg-slate-50 p-4 shadow-sm sm:flex-row sm:items-center">
           <FileText className="text-blue-600" size={24} />
-          <div>
-            <p className="font-medium text-gray-800">{file.name}</p>
-            <p className="text-sm text-gray-500">{(file.size / 1024).toFixed(1)} KB</p>
+          <div className="flex-1">
+            <p className="font-semibold text-slate-900">{file.name}</p>
+            <p className="text-sm text-slate-500">{(file.size / 1024).toFixed(1)} KB</p>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg">
+        <div className="rounded-3xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 shadow-sm">
           {error}
         </div>
       )}
@@ -117,7 +131,7 @@ export default function UploadBatch() {
           type="button"
           onClick={handleUpload}
           disabled={uploading}
-          className="mt-4 flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
+          className="inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {uploading ? (
             <>
@@ -131,26 +145,28 @@ export default function UploadBatch() {
       )}
 
       {result && (
-        <div className="mt-8 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Validation Summary</h3>
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="p-4 bg-gray-50 rounded-lg text-center">
-              <p className="text-2xl font-bold text-gray-800">{result.totalRecords}</p>
-              <p className="text-sm text-gray-500">Total Rows</p>
-            </div>
-            <div className="p-4 bg-green-50 rounded-lg text-center">
-              <p className="text-2xl font-bold text-green-700">{result.validCount}</p>
-              <p className="text-sm text-green-600">Valid Rows</p>
-            </div>
-            <div className="p-4 bg-red-50 rounded-lg text-center">
-              <p className="text-2xl font-bold text-red-700">{result.invalidCount}</p>
-              <p className="text-sm text-red-600">Invalid Rows</p>
+        <div className="space-y-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-3">Validation Summary</h3>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-3xl bg-slate-50 p-4 text-center">
+                <p className="text-3xl font-bold text-slate-900">{result.totalRecords}</p>
+                <p className="mt-2 text-sm text-slate-500">Total Rows</p>
+              </div>
+              <div className="rounded-3xl bg-emerald-50 p-4 text-center">
+                <p className="text-3xl font-bold text-emerald-700">{result.validCount}</p>
+                <p className="mt-2 text-sm text-emerald-600">Valid Rows</p>
+              </div>
+              <div className="rounded-3xl bg-rose-50 p-4 text-center">
+                <p className="text-3xl font-bold text-rose-700">{result.invalidCount}</p>
+                <p className="mt-2 text-sm text-rose-600">Invalid Rows</p>
+              </div>
             </div>
           </div>
 
           {result.invalidCount > 0 && (
-            <div className="mb-6">
-              <h4 className="text-sm font-semibold text-red-700 mb-2">Invalid Rows</h4>
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-rose-700">Invalid Rows</h4>
               <Table columns={invalidColumns} data={result.invalid || []} />
             </div>
           )}
@@ -159,7 +175,7 @@ export default function UploadBatch() {
             <button
               type="button"
               onClick={handleProceed}
-              className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+              className="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/10 transition hover:bg-emerald-700"
             >
               Proceed to Issue
             </button>
