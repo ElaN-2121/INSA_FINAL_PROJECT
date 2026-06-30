@@ -7,6 +7,7 @@
     "dev:wallet": "cd apps/user-wallet && npm run dev",
     "dev:university": "cd apps/university-portal && npm run dev",
     "dev:employer": "cd apps/employer-portal && npm run dev",
+    "dev:admin": "cd apps/admin-portal && npm run dev",
     "seed": "node scripts/seed-database.js",
     "generate-keys": "node scripts/generate-rsa-keys.js"
   }

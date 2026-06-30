@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Home, Upload, ClipboardList, ShieldCheck, Settings, LogOut, UserCircle } from 'lucide-react';
+import { Home, Upload, ClipboardList, Settings, LogOut, UserCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import logo from '../assets/Gemini_Generated_Image_pguz57pguz57pguz.png';
 
@@ -46,21 +46,6 @@ export default function DashboardLayout() {
               <span>{link.label}</span>
             </NavLink>
           ))}
-          {user?.role === 'ADMIN' && (
-            <NavLink
-              to="/admin/security"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? 'bg-slate-100 text-slate-900 shadow-sm'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                }`
-              }
-            >
-              <ShieldCheck size={18} />
-              <span>Security Demo</span>
-            </NavLink>
-          )}
         </nav>
 
         <div className="px-6 py-5 border-t border-slate-800">

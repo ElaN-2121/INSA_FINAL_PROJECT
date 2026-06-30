@@ -9,5 +9,5 @@ module.exports = {
   aesEncryptionKey: process.env.AES_ENCRYPTION_KEY,
   corsOrigins: process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
-    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
+    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'],
 };

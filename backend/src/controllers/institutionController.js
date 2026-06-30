@@ -62,6 +62,37 @@ async function getInstitutionById(req, res) {
   return success(res, institution, 'Institution retrieved successfully');
 }
 
+async function createRegistrar(req, res) {
+  const { full_name, email } = req.body;
+  const institution_id = req.params.institutionId;
+
+  if (!full_name || !email) {
+    return error(res, 'All fields are required', 400);
+  }
+
+  try {
+    const { user, temporaryPassword } = await institutionService.createRegistrarForInstitution(
+      { full_name, email, institution_id },
+      req.user.id
+    );
+
+    return success(
+      res,
+      { user, temporaryPassword },
+      'Registrar account created. Share the temporaryPassword with the registrar — it will not be shown again.',
+      201
+    );
+  } catch (err) {
+    if (
+      err.message === 'Institution not found or not yet approved' ||
+      err.message === 'This email is already registered'
+    ) {
+      return error(res, err.message, 409);
+    }
+    throw err;
+  }
+}
+
 module.exports = {
   registerInstitution,
   approveInstitution,
@@ -69,4 +100,5 @@ module.exports = {
   getTrustRegistry,
   getAllInstitutions,
   getInstitutionById,
+  createRegistrar,
 };

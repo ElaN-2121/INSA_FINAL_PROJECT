@@ -10,6 +10,8 @@ const VERIFICATION_DENIED = 'VERIFICATION_DENIED';
 const VERIFICATION_COMPLETED = 'VERIFICATION_COMPLETED';
 const INSTITUTION_REGISTERED = 'INSTITUTION_REGISTERED';
 const INSTITUTION_APPROVED = 'INSTITUTION_APPROVED';
+const REGISTRAR_CREATED = 'REGISTRAR_CREATED';
+const ADMIN_CREATED = 'ADMIN_CREATED';
 
 async function log({ userId, action, entityType, entityId, ipAddress, details }, client = null) {
   const db = client || { query };
@@ -41,6 +43,8 @@ module.exports = {
   VERIFICATION_COMPLETED,
   INSTITUTION_REGISTERED,
   INSTITUTION_APPROVED,
+  REGISTRAR_CREATED,
+  ADMIN_CREATED,
   log,
   getRecentLogs,
 };

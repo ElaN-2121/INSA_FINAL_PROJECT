@@ -38,6 +38,15 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
     const { token: newToken, user: newUser } = data.data;
+
+    if (newUser.role === 'ADMIN') {
+      throw new Error('Admin accounts must use the Admin Portal at http://localhost:5176');
+    }
+
+    if (newUser.role !== 'UNIVERSITY') {
+      throw new Error('This portal is for university registrars only.');
+    }
+
     persistSession(newToken, newUser);
     return newUser;
   }, [persistSession]);

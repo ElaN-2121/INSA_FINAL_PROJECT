@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import Register from './Register.jsx';
 
 const TOKEN_KEY = 'ethiocred_token';
 const USER_KEY = 'ethiocred_user';
 
 export default function Login() {
+  const [showRegister, setShowRegister] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -32,6 +34,10 @@ export default function Login() {
       setSubmitting(false);
     }
   };
+
+  if (showRegister) {
+    return <Register onBack={() => { setShowRegister(false); setError(''); }} />;
+  }
 
   return (
     <div>
@@ -70,6 +76,17 @@ export default function Login() {
           {submitting ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
+
+      <p className="mt-6 text-center text-sm text-gray-600">
+        New employer?{' '}
+        <button
+          type="button"
+          onClick={() => { setShowRegister(true); setError(''); }}
+          className="font-medium text-blue-600 hover:text-blue-700"
+        >
+          Register your company
+        </button>
+      </p>
     </div>
   );
 }

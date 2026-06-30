@@ -42,6 +42,18 @@ export function AuthProvider({ children }) {
     return newUser;
   }, [persistSession]);
 
+  const register = useCallback(async ({ full_name, email, password, company_name }) => {
+    const { data } = await api.post('/auth/register/employer', {
+      full_name,
+      email,
+      password,
+      company_name,
+    });
+    const { token: newToken, user: newUser } = data.data;
+    persistSession(newToken, newUser);
+    return newUser;
+  }, [persistSession]);
+
   const loginWithFayda = useCallback(async (faydaId) => {
     const { data } = await api.post('/auth/login/fayda', { fayda_id: faydaId });
     const { token: newToken, user: newUser } = data.data;
@@ -63,11 +75,12 @@ export function AuthProvider({ children }) {
       token,
       isLoading,
       login,
+      register,
       loginWithFayda,
       logout,
       isAuthenticated: Boolean(token && user),
     }),
-    [user, token, isLoading, login, loginWithFayda, logout]
+    [user, token, isLoading, login, register, loginWithFayda, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

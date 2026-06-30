@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+ALTER TABLE users ADD COLUMN IF NOT EXISTS company_name VARCHAR(255);
+
 ALTER TABLE institutions
     DROP CONSTRAINT IF EXISTS fk_institutions_approved_by;
 

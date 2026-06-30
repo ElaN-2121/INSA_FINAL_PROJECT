@@ -49,6 +49,13 @@ export function AuthProvider({ children }) {
     return newUser;
   }, [persistSession]);
 
+  const register = useCallback(async ({ full_name, fayda_id, email }) => {
+    const { data } = await api.post('/auth/register/student', { full_name, fayda_id, email });
+    const { token: newToken, user: newUser } = data.data;
+    persistSession(newToken, newUser);
+    return newUser;
+  }, [persistSession]);
+
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
@@ -64,10 +71,11 @@ export function AuthProvider({ children }) {
       isLoading,
       login,
       loginWithFayda,
+      register,
       logout,
       isAuthenticated: Boolean(token && user),
     }),
-    [user, token, isLoading, login, loginWithFayda, logout]
+    [user, token, isLoading, login, loginWithFayda, register, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

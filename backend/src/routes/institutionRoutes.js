@@ -12,5 +12,6 @@ router.post('/', authenticate, authorize('ADMIN'), institutionController.registe
 router.get('/:id', authenticate, institutionController.getInstitutionById);
 router.patch('/:id/approve', authenticate, authorize('ADMIN'), institutionController.approveInstitution);
 router.patch('/:id/suspend', authenticate, authorize('ADMIN'), institutionController.suspendInstitution);
+router.post('/:institutionId/registrars', authenticate, authorize('ADMIN'), institutionController.createRegistrar);
 
 module.exports = router;

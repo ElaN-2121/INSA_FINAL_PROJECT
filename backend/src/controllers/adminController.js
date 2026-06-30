@@ -1,5 +1,7 @@
 const { query } = require('../config/database');
-const { success } = require('../utils/apiResponse');
+const authService = require('../services/authService');
+const institutionService = require('../services/institutionService');
+const { success, error } = require('../utils/apiResponse');
 
 async function getAuditLogs(req, res) {
   const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
@@ -54,8 +56,42 @@ async function getSystemStats(req, res) {
   }, 'System stats retrieved successfully');
 }
 
+async function createAdmin(req, res) {
+  const { full_name, email, password } = req.body;
+
+  if (!full_name || !email || !password) {
+    return error(res, 'All fields are required', 400);
+  }
+
+  try {
+    const newAdmin = await authService.createAdmin({ full_name, email, password }, req.user.id);
+    return success(res, newAdmin, 'Admin account created', 201);
+  } catch (err) {
+    if (
+      err.message === 'This email is already registered' ||
+      err.message === 'Password must be at least 8 characters'
+    ) {
+      return error(res, err.message, 409);
+    }
+    throw err;
+  }
+}
+
+async function getPendingInstitutions(req, res) {
+  const institutions = await institutionService.getPendingInstitutions();
+  return success(res, institutions, 'Pending institutions retrieved successfully');
+}
+
+async function getAllInstitutionsAdmin(req, res) {
+  const institutions = await institutionService.getAllInstitutionsWithRegistrarCounts();
+  return success(res, institutions, 'Institutions retrieved successfully');
+}
+
 module.exports = {
   getAuditLogs,
   getAllUsers,
   getSystemStats,
+  createAdmin,
+  getPendingInstitutions,
+  getAllInstitutionsAdmin,
 };

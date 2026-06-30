@@ -15,12 +15,22 @@ async function findByFaydaId(faydaId) {
   return result.rows[0] || null;
 }
 
-async function createUser({ email, password_hash, role, full_name, fayda_id, institution_id }) {
+async function findByFaydaIdOrNull(faydaId) {
+  const result = await query('SELECT * FROM users WHERE fayda_id = $1', [faydaId]);
+  return result.rows[0] || null;
+}
+
+async function countByRole(role) {
+  const result = await query('SELECT COUNT(*)::int AS count FROM users WHERE role = $1', [role]);
+  return result.rows[0].count;
+}
+
+async function createUser({ email, password_hash, role, full_name, fayda_id, institution_id, company_name }) {
   const result = await query(
-    `INSERT INTO users (email, password_hash, role, full_name, fayda_id, institution_id)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO users (email, password_hash, role, full_name, fayda_id, institution_id, company_name)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
-    [email, password_hash, role, full_name, fayda_id, institution_id]
+    [email, password_hash, role, full_name, fayda_id, institution_id, company_name]
   );
   return result.rows[0];
 }
@@ -61,6 +71,8 @@ module.exports = {
   findById,
   findByEmail,
   findByFaydaId,
+  findByFaydaIdOrNull,
+  countByRole,
   createUser,
   updateUser,
   findByRole,

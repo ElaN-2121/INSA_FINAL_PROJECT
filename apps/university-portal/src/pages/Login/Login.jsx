@@ -2,10 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 
-const TOKEN_KEY = 'ethiocred_token';
-const USER_KEY = 'ethiocred_user';
-const ALLOWED_ROLES = ['UNIVERSITY', 'ADMIN'];
-
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,16 +15,10 @@ export default function Login() {
     setError('');
     setSubmitting(true);
     try {
-      const user = await login(email, password);
-      if (!ALLOWED_ROLES.includes(user.role)) {
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
-        window.location.href = '/unauthorized';
-        return;
-      }
+      await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid email or password');
+      setError(err.message || err.response?.data?.message || 'Invalid email or password');
     } finally {
       setSubmitting(false);
     }

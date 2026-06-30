@@ -61,9 +61,69 @@ async function getMe(req, res) {
   return success(res, userWithoutPassword, 'Success');
 }
 
+async function registerStudent(req, res) {
+  const { full_name, fayda_id, email } = req.body;
+
+  if (!full_name || !fayda_id || !email) {
+    return error(res, 'All fields are required', 400);
+  }
+
+  try {
+    const { token, user } = await authService.registerStudent({ full_name, fayda_id, email });
+
+    await auditService.log({
+      userId: user.id,
+      action: auditService.USER_LOGIN,
+      entityType: 'user',
+      entityId: user.id,
+      ipAddress: req.ip,
+      details: { email: user.email, registration: true },
+    });
+
+    return success(res, { token, user }, 'Registration successful', 201);
+  } catch (err) {
+    if (
+      err.message === 'This Fayda ID is already registered' ||
+      err.message === 'This email is already registered'
+    ) {
+      return error(res, err.message, 409);
+    }
+    throw err;
+  }
+}
+
+async function registerEmployer(req, res) {
+  const { full_name, email, password, company_name } = req.body;
+
+  if (!full_name || !email || !password || !company_name) {
+    return error(res, 'All fields are required', 400);
+  }
+
+  try {
+    const { token, user } = await authService.registerEmployer({
+      full_name,
+      email,
+      password,
+      company_name,
+    });
+
+    return success(res, { token, user }, 'Registration successful', 201);
+  } catch (err) {
+    if (
+      err.message === 'This email is already registered' ||
+      err.message === 'Password must be at least 8 characters'
+    ) {
+      return error(res, err.message, 409);
+    }
+    throw err;
+  }
+}
+
 module.exports = {
   login,
   loginWithFayda,
   logout,
   getMe,
+  registerStudent,
+  registerEmployer,
 };
