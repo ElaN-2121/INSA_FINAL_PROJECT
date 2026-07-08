@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
   Building2,
+  BarChart3,
   UserPlus,
   Shield,
   ScrollText,
@@ -16,6 +17,7 @@ import logo from '../assets/logo.png';
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { to: '/institutions', label: 'Institutions', Icon: Building2 },
+  { to: '/analytics', label: 'Analytics', Icon: BarChart3 },
   { to: '/audit-logs', label: 'Audit Logs', Icon: ScrollText },
   { to: '/create-admin', label: 'Create Admin', Icon: UserPlus },
   { to: '/security-demo', label: 'Security Demo', Icon: Shield },

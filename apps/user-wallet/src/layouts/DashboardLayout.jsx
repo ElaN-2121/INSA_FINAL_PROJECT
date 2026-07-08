@@ -4,6 +4,9 @@ import {
   LayoutDashboard,
   Wallet,
   ShieldCheck,
+  Link2,
+  Eye,
+  UserCircle,
   Bell,
   LogOut,
   Menu,
@@ -16,6 +19,9 @@ const navLinks = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { to: '/credentials', label: 'My Credentials', Icon: Wallet },
   { to: '/requests', label: 'Verification Requests', Icon: ShieldCheck },
+  { to: '/share-links', label: 'Share Links', Icon: Link2 },
+  { to: '/verification-history', label: 'Verification History', Icon: Eye },
+  { to: '/profile', label: 'Profile', Icon: UserCircle },
   { to: '/notifications', label: 'Notifications', Icon: Bell },
 ];
 

@@ -10,5 +10,6 @@ router.post('/register/student', authController.registerStudent);
 router.post('/register/employer', authController.registerEmployer);
 router.post('/logout', authenticate, authController.logout);
 router.get('/me', authenticate, authController.getMe);
+router.patch('/profile', authenticate, authController.updateProfile);
 
 module.exports = router;

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Wallet, CheckCircle, Bell } from 'lucide-react';
+import { Shield, Wallet, Link2, Eye, FileDown, Bell } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
 const steps = [
   { icon: Wallet, title: 'Receive credentials', text: 'Universities issue digitally signed credentials directly to your wallet.' },
   { icon: Shield, title: 'Control access', text: 'Approve or deny employer verification requests before anyone sees your data.' },
-  { icon: CheckCircle, title: 'Share securely', text: 'Generate QR codes so trusted parties can verify your credentials instantly.' },
+  { icon: Link2, title: 'Shareable links', text: 'Generate time-limited verification links anyone can use — no account required.' },
+  { icon: Eye, title: 'Verification history', text: 'See who verified your credentials and when, with full employer details.' },
+  { icon: FileDown, title: 'Download PDFs', text: 'Export a visual credential certificate for your records or sharing.' },
   { icon: Bell, title: 'Stay informed', text: 'Get notified when someone requests access to your academic records.' },
 ];
 
@@ -93,7 +95,7 @@ export default function Landing() {
 
       <section className={`mx-auto max-w-6xl px-4 py-16 sm:px-6 ${fade()}`}>
         <h2 className="mb-10 text-center text-2xl font-semibold text-gray-900">How It Works</h2>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {steps.map((step, index) => (
             <div
               key={step.title}

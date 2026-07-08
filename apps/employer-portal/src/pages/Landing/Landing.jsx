@@ -4,9 +4,9 @@ import { Send, UserCheck, ShieldCheck, FileText } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
 const steps = [
-  { icon: Send, title: 'Request access', text: 'Submit a verification request for a candidate\'s credential.' },
+  { icon: Send, title: 'Request access', text: 'Submit a verification request — consent-based verified access before you can verify.' },
   { icon: UserCheck, title: 'Student approves', text: 'The graduate reviews and grants consent before you can verify.' },
-  { icon: ShieldCheck, title: 'Cryptographic check', text: 'We validate the institution, signature, integrity, and revocation status.' },
+  { icon: ShieldCheck, title: 'Instant cryptographic verification', text: 'We validate the institution, RSA signature, integrity, and revocation status in seconds.' },
   { icon: FileText, title: 'Instant results', text: 'Receive a clear VALID or INVALID outcome with full credential details.' },
 ];
 
@@ -51,7 +51,7 @@ export default function Landing() {
           <img src={logo} alt="EthioCred logo" className="mx-auto mb-6 h-20 w-20 rounded-2xl bg-white/10 p-2 object-contain" />
           <h1 className="text-3xl font-bold tracking-tight sm:text-5xl">EthioCred Employer Portal</h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-blue-100 sm:text-xl">
-            Verify academic credentials in seconds, not weeks.
+            Consent-based verified access and instant cryptographic verification for hiring teams.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link

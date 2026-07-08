@@ -13,6 +13,8 @@ import StagingDashboard from '../pages/StagingDashboard/StagingDashboard.jsx';
 import IssuedCredentials from '../pages/IssuedCredentials/IssuedCredentials.jsx';
 import CredentialDetail from '../pages/CredentialDetail/CredentialDetail.jsx';
 import Settings from '../pages/Settings/Settings.jsx';
+import PublicLeaderboard from '../pages/PublicLeaderboard/PublicLeaderboard.jsx';
+import Analytics from '../pages/Analytics/Analytics.jsx';
 
 const UNIVERSITY_ROLES = ['UNIVERSITY'];
 
@@ -47,6 +49,7 @@ export default function AppRoutes() {
         }
       />
       <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/leaderboard" element={<PublicLeaderboard />} />
       <Route
         element={
           <ProtectedRoute role={UNIVERSITY_ROLES}>
@@ -59,6 +62,7 @@ export default function AppRoutes() {
         <Route path="/staging/:batchId" element={<StagingDashboard />} />
         <Route path="/credentials" element={<IssuedCredentials />} />
         <Route path="/credentials/:id" element={<CredentialDetail />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

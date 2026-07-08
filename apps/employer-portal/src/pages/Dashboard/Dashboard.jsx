@@ -1,18 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 import { get, formatDateTime } from '@ethiocred/utils';
+import { Trophy } from 'lucide-react';
 import Badge from '../../components/Badge/Badge.jsx';
 import Table from '../../components/Table/Table.jsx';
 import Loader from '../../components/Loader/Loader.jsx';
 import { getVerificationResults } from '../../utils/verificationCache.js';
 
+const API_BASE = 'http://localhost:5000/api';
+
 export default function Dashboard() {
   const [history, setHistory] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    get('/verification/history')
-      .then(({ data }) => setHistory(data.data || []))
+    Promise.all([
+      get('/verification/history'),
+      axios.get(`${API_BASE}/analytics/leaderboard`),
+    ])
+      .then(([historyRes, lbRes]) => {
+        setHistory(historyRes.data.data || []);
+        setLeaderboard((lbRes.data.data || []).slice(0, 5));
+      })
       .catch((err) => setError(err.response?.data?.message || 'Failed to load history'))
       .finally(() => setLoading(false));
   }, []);
@@ -66,18 +77,43 @@ export default function Dashboard() {
         </div>
       )}
 
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Total Verifications Run</p>
-          <p className="mt-1 text-3xl font-bold text-blue-600">{stats.total}</p>
+      <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+              <p className="text-sm text-gray-500">Total Verifications Run</p>
+              <p className="mt-1 text-3xl font-bold text-blue-600">{stats.total}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+              <p className="text-sm text-gray-500">Verified Count</p>
+              <p className="mt-1 text-3xl font-bold text-indigo-600">{stats.verified}</p>
+            </div>
+            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+              <p className="text-sm text-gray-500">Failed / Invalid Count</p>
+              <p className="mt-1 text-3xl font-bold text-gray-700">{stats.failed}</p>
+            </div>
+          </div>
         </div>
+
         <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Verified Count</p>
-          <p className="mt-1 text-3xl font-bold text-indigo-600">{stats.verified}</p>
-        </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-gray-500">Failed / Invalid Count</p>
-          <p className="mt-1 text-3xl font-bold text-gray-700">{stats.failed}</p>
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-900">
+            <Trophy size={16} className="text-blue-600" />
+            Top Universities
+          </h3>
+          {leaderboard.length === 0 ? (
+            <p className="text-sm text-gray-500">No ranking data yet.</p>
+          ) : (
+            <ol className="space-y-3">
+              {leaderboard.map((row, index) => (
+                <li key={row.id} className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-gray-900">
+                    {index + 1}. {row.name}
+                  </span>
+                  <span className="text-gray-500">{row.verifications_completed} verified</span>
+                </li>
+              ))}
+            </ol>
+          )}
         </div>
       </div>
 

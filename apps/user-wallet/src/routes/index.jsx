@@ -13,6 +13,10 @@ import Credentials from '../pages/Credentials/Credentials.jsx';
 import CredentialDetail from '../pages/CredentialDetail/CredentialDetail.jsx';
 import VerificationRequests from '../pages/VerificationRequests/VerificationRequests.jsx';
 import Notifications from '../pages/Notifications/Notifications.jsx';
+import ShareVerify from '../pages/ShareVerify/ShareVerify.jsx';
+import ShareLinks from '../pages/ShareLinks/ShareLinks.jsx';
+import VerificationHistory from '../pages/VerificationHistory/VerificationHistory.jsx';
+import Profile from '../pages/Profile/Profile.jsx';
 
 function LandingRoute() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -58,6 +62,7 @@ export default function AppRoutes() {
         }
       />
       <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/verify/:token" element={<ShareVerify />} />
       <Route
         element={
           <ProtectedRoute role="STUDENT">
@@ -69,6 +74,9 @@ export default function AppRoutes() {
         <Route path="/credentials" element={<Credentials />} />
         <Route path="/credentials/:id" element={<CredentialDetail />} />
         <Route path="/requests" element={<VerificationRequests />} />
+        <Route path="/share-links" element={<ShareLinks />} />
+        <Route path="/verification-history" element={<VerificationHistory />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/notifications" element={<Notifications />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

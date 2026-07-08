@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { get, post, formatDate, formatDateTime } from '@ethiocred/utils';
+import { get, post, api, formatDate, formatDateTime } from '@ethiocred/utils';
+import { FileDown } from 'lucide-react';
 import Badge from '../../components/Badge/Badge.jsx';
 import Modal from '../../components/Modal/Modal.jsx';
 import Loader from '../../components/Loader/Loader.jsx';
@@ -21,6 +22,7 @@ export default function CredentialDetail() {
   const [reason, setReason] = useState('');
   const [revoking, setRevoking] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   const fetchCredential = () => {
     setLoading(true);
@@ -47,6 +49,23 @@ export default function CredentialDetail() {
       setError(err.response?.data?.message || 'Revocation failed');
     } finally {
       setRevoking(false);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    setDownloadingPdf(true);
+    try {
+      const response = await api.get(`/credentials/${id}/pdf`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `credential-${credential.serial_number}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to download PDF');
+    } finally {
+      setDownloadingPdf(false);
     }
   };
 
@@ -124,6 +143,21 @@ export default function CredentialDetail() {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <button
+          type="button"
+          onClick={handleDownloadPdf}
+          disabled={downloadingPdf}
+          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2 font-medium text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50"
+        >
+          <FileDown size={16} />
+          {downloadingPdf ? 'Downloading…' : 'Download PDF'}
+        </button>
+        <p className="mt-2 text-xs text-slate-500">
+          This PDF is a visual representation only. Cryptographic verification always takes precedence.
+        </p>
       </div>
 
       <div className="rounded-[2rem] border border-slate-200 bg-slate-950 p-6 shadow-sm">

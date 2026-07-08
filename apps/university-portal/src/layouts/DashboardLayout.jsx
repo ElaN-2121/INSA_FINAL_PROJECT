@@ -4,6 +4,8 @@ import {
   LayoutDashboard,
   Upload,
   FileCheck2,
+  TrendingUp,
+  Trophy,
   Settings,
   LogOut,
   Menu,
@@ -16,6 +18,8 @@ const navLinks = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { to: '/upload', label: 'Upload Batch', Icon: Upload },
   { to: '/credentials', label: 'Issued Credentials', Icon: FileCheck2 },
+  { to: '/analytics', label: 'Analytics', Icon: TrendingUp },
+  { to: '/leaderboard', label: 'Rankings', Icon: Trophy },
   { to: '/settings', label: 'Settings', Icon: Settings },
 ];
 

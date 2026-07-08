@@ -129,6 +129,23 @@ async function findApprovedRequest(credentialId, employerId) {
   return result.rows[0] || null;
 }
 
+async function findByCredentialIds(credentialIds) {
+  if (!credentialIds || credentialIds.length === 0) {
+    return [];
+  }
+
+  const result = await query(
+    `SELECT vl.*, vr.employer_id, u.full_name AS employer_name, u.company_name
+     FROM verification_logs vl
+     LEFT JOIN verification_requests vr ON vr.id = vl.request_id
+     LEFT JOIN users u ON u.id = vr.employer_id
+     WHERE vl.credential_id = ANY($1::uuid[])
+     ORDER BY vl.checked_at DESC`,
+    [credentialIds]
+  );
+  return result.rows;
+}
+
 async function findApprovedCredentialsForEmployer(employerId) {
   const result = await query(
     `SELECT vr.id AS request_id, vr.credential_id, c.serial_number, c.degree_name, c.major, c.graduation_year,
@@ -154,5 +171,6 @@ module.exports = {
   createLog,
   findLogsByCredentialId,
   findApprovedRequest,
+  findByCredentialIds,
   findApprovedCredentialsForEmployer,
 };

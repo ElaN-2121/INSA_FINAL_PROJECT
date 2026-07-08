@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, FileCheck2, ShieldOff, BarChart3 } from 'lucide-react';
+import { Upload, FileCheck2, ShieldOff, BarChart3, Trophy } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
 const steps = [
@@ -29,12 +29,20 @@ export default function Landing() {
             <img src={logo} alt="EthioCred logo" className="h-10 w-10 rounded-lg object-contain" />
             <span className="text-lg font-semibold text-gray-900">EthioCred</span>
           </div>
-          <Link
-            to="/login"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Login
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/leaderboard"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:text-blue-700"
+            >
+              Rankings
+            </Link>
+            <Link
+              to="/login"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Login
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -64,6 +72,26 @@ export default function Landing() {
           register in a trusted institution network, and let graduates and employers verify authenticity
           without endless phone calls or email chains.
         </p>
+      </section>
+
+      <section className={`mx-auto max-w-6xl px-4 pb-8 sm:px-6 ${fade()}`}>
+        <div className="rounded-2xl border border-indigo-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-8 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-900">
+              <Trophy size={22} className="text-indigo-600" />
+              National Credential Rankings
+            </h2>
+            <p className="mt-2 max-w-xl text-sm text-gray-600">
+              See how your graduates compare nationally — employer verifications, credentials issued, and more.
+            </p>
+          </div>
+          <Link
+            to="/leaderboard"
+            className="mt-4 inline-block shrink-0 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:mt-0"
+          >
+            View Rankings
+          </Link>
+        </div>
       </section>
 
       <section className={`bg-white px-4 py-16 sm:px-6 ${fade()}`}>

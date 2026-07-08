@@ -11,6 +11,8 @@ const credentialRoutes = require('./routes/credentialRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const verificationRoutes = require('./routes/verificationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
+const shareLinkRoutes = require('./routes/shareLinkRoutes');
 const { error } = require('./utils/apiResponse');
 const securityRoutes = require('./routes/securityRoutes');
 
@@ -38,6 +40,8 @@ app.use('/api/credentials', credentialRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/verification', verificationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/share-links', shareLinkRoutes);
 app.use('/api/security', securityRoutes);
 
 app.get('/api/health', (_req, res) => {

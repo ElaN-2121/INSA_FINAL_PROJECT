@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Building2, Copy, Plus, UserPlus } from 'lucide-react';
+import { Building2, ChevronDown, ChevronRight, Copy, Key, Plus, UserPlus } from 'lucide-react';
 import { get, post, patch } from '../../services/api.js';
 import Badge from '../../components/Badge/Badge.jsx';
 import Table from '../../components/Table/Table.jsx';
 import Loader from '../../components/Loader/Loader.jsx';
+import ApiKeysModal from '../../components/ApiKeysModal/ApiKeysModal.jsx';
 import { formatDate } from '../../utils/formatDate.js';
 
 function statusBadge(status) {
@@ -65,6 +66,9 @@ export default function Institutions() {
   const [registrarResult, setRegistrarResult] = useState(null);
   const [registrarSubmitting, setRegistrarSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [apiKeysOpen, setApiKeysOpen] = useState(false);
+  const [apiKeysInstitution, setApiKeysInstitution] = useState(null);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   const loadInstitutions = useCallback(async () => {
     setLoading(true);
@@ -209,6 +213,17 @@ export default function Institutions() {
                 <UserPlus size={12} />
                 Add Registrar
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setApiKeysInstitution(row);
+                  setApiKeysOpen(true);
+                }}
+                className={btnPrimarySm}
+              >
+                <Key size={12} />
+                API Keys
+              </button>
             </>
           )}
         </div>
@@ -254,6 +269,43 @@ export default function Institutions() {
       {actionError && (
         <div className="rounded-3xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{actionError}</div>
       )}
+
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <button
+          type="button"
+          onClick={() => setGuideOpen((open) => !open)}
+          className="flex w-full items-center gap-2 px-5 py-4 text-left text-sm font-semibold text-gray-900 hover:bg-gray-50"
+        >
+          {guideOpen ? <ChevronDown size={18} className="text-blue-600" /> : <ChevronRight size={18} className="text-blue-600" />}
+          API Integration Guide
+        </button>
+        {guideOpen && (
+          <div className="border-t border-gray-100 px-5 pb-5 pt-2">
+            <p className="mb-4 text-sm text-gray-600">
+              Institutions can integrate EthioCred directly into their Student Information Systems using an API key.
+              Include the key in the <code className="rounded bg-gray-100 px-1">X-API-Key</code> header when calling the
+              credential issuance endpoint — no portal login required.
+            </p>
+            <pre className="overflow-x-auto rounded-xl bg-gray-900 p-4 text-xs text-emerald-300">
+{`POST /api/credentials/api/issue
+X-API-Key: ethiocred_your_key_here
+Content-Type: application/json
+
+{
+  "students": [{
+    "full_name": "...",
+    "fayda_id": "...",
+    "email": "...",
+    "degree_name": "...",
+    "major": "...",
+    "graduation_year": 2024,
+    "gpa": 3.85
+  }]
+}`}
+            </pre>
+          </div>
+        )}
+      </div>
 
       <Table columns={columns} data={institutions} emptyMessage="No institutions registered yet." />
 
@@ -335,6 +387,16 @@ export default function Institutions() {
             </div>
           )}
         </OverlayModal>
+      )}
+
+      {apiKeysOpen && apiKeysInstitution && (
+        <ApiKeysModal
+          institution={apiKeysInstitution}
+          onClose={() => {
+            setApiKeysOpen(false);
+            setApiKeysInstitution(null);
+          }}
+        />
       )}
 
       {registrarOpen && (

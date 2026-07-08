@@ -1,5 +1,6 @@
 const express = require('express');
 const adminController = require('../controllers/adminController');
+const apiKeyController = require('../controllers/apiKeyController');
 const institutionController = require('../controllers/institutionController');
 const authenticate = require('../middleware/authenticate');
 const authorize = require('../middleware/authorize');
@@ -17,5 +18,9 @@ router.get('/institutions', adminController.getAllInstitutionsAdmin);
 router.post('/institutions', institutionController.registerInstitution);
 router.patch('/institutions/:id/approve', institutionController.approveInstitution);
 router.patch('/institutions/:id/suspend', institutionController.suspendInstitution);
+
+router.post('/institutions/:institutionId/api-keys', apiKeyController.generateKey);
+router.get('/institutions/:institutionId/api-keys', apiKeyController.listKeys);
+router.delete('/institutions/:institutionId/api-keys/:keyId', apiKeyController.revokeKey);
 
 module.exports = router;
