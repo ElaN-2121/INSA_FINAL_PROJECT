@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Wallet, Link2, Eye, FileDown, Bell } from 'lucide-react';
+import SkillMatrix from '../../components/SkillMatrix/SkillMatrix.jsx';
 import logo from '../../assets/logo.png';
 
 const steps = [
@@ -111,6 +112,8 @@ export default function Landing() {
           ))}
         </div>
       </section>
+
+      <SkillMatrix />
 
       <footer className="border-t border-gray-200 bg-gray-900 px-4 py-10 text-gray-300 sm:px-6">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 sm:flex-row sm:justify-between">

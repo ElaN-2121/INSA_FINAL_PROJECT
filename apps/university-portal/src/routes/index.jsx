@@ -39,6 +39,7 @@ function LandingRoute() {
 export default function AppRoutes() {
   return (
     <Routes>
+      {/* Public routes — no authentication required */}
       <Route path="/" element={<LandingRoute />} />
       <Route
         path="/login"
@@ -48,23 +49,22 @@ export default function AppRoutes() {
           </AuthLayout>
         }
       />
-      <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/leaderboard" element={<PublicLeaderboard />} />
-      <Route
-        element={
-          <ProtectedRoute role={UNIVERSITY_ROLES}>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/upload" element={<UploadBatch />} />
-        <Route path="/staging/:batchId" element={<StagingDashboard />} />
-        <Route path="/credentials" element={<IssuedCredentials />} />
-        <Route path="/credentials/:id" element={<CredentialDetail />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/settings" element={<Settings />} />
+
+      {/* Protected routes — authentication required */}
+      <Route element={<ProtectedRoute role={UNIVERSITY_ROLES} />}>
+        <Route element={<DashboardLayout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/upload" element={<UploadBatch />} />
+          <Route path="/staging/:batchId" element={<StagingDashboard />} />
+          <Route path="/credentials" element={<IssuedCredentials />} />
+          <Route path="/credentials/:id" element={<CredentialDetail />} />
+          <Route path="/analytics" element={<Analytics />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
       </Route>
+
+      <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

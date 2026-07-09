@@ -8,6 +8,12 @@ const bcrypt = require('bcrypt');
 const ROOT = path.join(__dirname, '..');
 const SCHEMA_PATH = path.join(ROOT, 'database', 'schema.sql');
 const SEED_PATH = path.join(ROOT, 'database', 'seed.sql');
+const MIGRATIONS_DIR = path.join(ROOT, 'database', 'migrations');
+const MIGRATION_FILES = [
+  'add_share_links.sql',
+  'add_api_keys.sql',
+  'add_missing_indexes.sql',
+];
 
 console.log("DATABASE_URL =", process.env.DATABASE_URL);
 
@@ -43,6 +49,13 @@ async function seedDatabase() {
     console.log('Running schema.sql...');
     await runSqlFile(client, SCHEMA_PATH);
     console.log('Schema applied successfully.');
+
+    for (const file of MIGRATION_FILES) {
+      const migrationPath = path.join(MIGRATIONS_DIR, file);
+      console.log(`Running migration: ${file}...`);
+      await runSqlFile(client, migrationPath);
+      console.log(`Migration ${file} applied successfully.`);
+    }
 
     console.log('Running seed.sql with bcrypt password hashing...');
     await runSqlFile(client, SEED_PATH, PASSWORDS);

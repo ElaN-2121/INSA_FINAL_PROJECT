@@ -11,6 +11,7 @@ cp .env.example backend/.env
 
 ### 3. Set up database
 psql -U postgres -d ethiocred -f database/schema.sql
+node scripts/run-migrations.js
 node scripts/seed-database.js
 
 ### 4. Start the backend

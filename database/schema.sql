@@ -165,6 +165,38 @@ CREATE TABLE IF NOT EXISTS csv_batches (
 );
 
 -- ---------------------------------------------------------------------------
+-- Table 11: credential_share_links
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS credential_share_links (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    credential_id UUID NOT NULL REFERENCES credentials(id) ON DELETE CASCADE,
+    student_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(64) UNIQUE NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    max_views INTEGER DEFAULT NULL CHECK (max_views IS NULL OR max_views > 0),
+    view_count INTEGER NOT NULL DEFAULT 0 CHECK (view_count >= 0),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ---------------------------------------------------------------------------
+-- Table 12: institution_api_keys
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS institution_api_keys (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    institution_id UUID NOT NULL REFERENCES institutions(id) ON DELETE CASCADE,
+    key_hash TEXT NOT NULL UNIQUE,
+    key_prefix VARCHAR(12) NOT NULL,
+    label VARCHAR(100),
+    last_used_at TIMESTAMP,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP
+);
+
+-- ---------------------------------------------------------------------------
 -- Indexes
 -- ---------------------------------------------------------------------------
 CREATE INDEX IF NOT EXISTS idx_credentials_holder_id ON credentials(holder_id);
@@ -172,4 +204,14 @@ CREATE INDEX IF NOT EXISTS idx_credentials_institution_id ON credentials(institu
 CREATE INDEX IF NOT EXISTS idx_credentials_serial_number ON credentials(serial_number);
 CREATE INDEX IF NOT EXISTS idx_verification_requests_employer_id ON verification_requests(employer_id);
 CREATE INDEX IF NOT EXISTS idx_verification_requests_student_id ON verification_requests(student_id);
+CREATE INDEX IF NOT EXISTS idx_verification_requests_credential_id ON verification_requests(credential_id);
+CREATE INDEX IF NOT EXISTS idx_verification_logs_credential_id ON verification_logs(credential_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_csv_batches_institution_id ON csv_batches(institution_id);
+CREATE INDEX IF NOT EXISTS idx_revoked_credentials_credential_id ON revoked_credentials(credential_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_share_links_token ON credential_share_links(token);
+CREATE INDEX IF NOT EXISTS idx_share_links_credential_id ON credential_share_links(credential_id);
+CREATE INDEX IF NOT EXISTS idx_share_links_student_id ON credential_share_links(student_id);
+CREATE INDEX IF NOT EXISTS idx_api_keys_institution ON institution_api_keys(institution_id);
+CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON institution_api_keys(key_hash);

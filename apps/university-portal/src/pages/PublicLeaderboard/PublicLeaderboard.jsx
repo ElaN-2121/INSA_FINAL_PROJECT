@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Award, GraduationCap, TrendingUp } from 'lucide-react';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext.jsx';
 import Loader from '../../components/Loader/Loader.jsx';
+import DepartmentDemandBadges, { API_BASE } from '../../components/SkillMatrix/DepartmentDemandBadges.jsx';
 import logo from '../../assets/logo.png';
-
-const API_BASE = 'http://localhost:5000/api';
 
 function rankBorder(index) {
   if (index === 0) return 'border-l-4 border-l-amber-400 bg-amber-50/30';
@@ -14,11 +14,20 @@ function rankBorder(index) {
   return '';
 }
 
+function formatRefreshTime(date) {
+  return date.toLocaleString(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+}
+
 export default function PublicLeaderboard() {
+  const { isAuthenticated } = useAuth();
   const [leaderboard, setLeaderboard] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -28,6 +37,7 @@ export default function PublicLeaderboard() {
       .then(([lbRes, deptRes]) => {
         setLeaderboard(lbRes.data.data || []);
         setDepartments(deptRes.data.data || []);
+        setLastUpdated(new Date());
       })
       .catch(() => setError('Failed to load rankings'))
       .finally(() => setLoading(false));
@@ -49,12 +59,23 @@ export default function PublicLeaderboard() {
             <img src={logo} alt="EthioCred logo" className="h-10 w-10 rounded-lg object-contain" />
             <span className="text-lg font-semibold text-gray-900">EthioCred Rankings</span>
           </div>
-          <Link
-            to="/login"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-          >
-            University Login
-          </Link>
+          <div className="flex items-center gap-3">
+            {isAuthenticated ? (
+              <Link
+                to="/dashboard"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              >
+                Back to Dashboard
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              >
+                University Login
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
@@ -67,6 +88,11 @@ export default function PublicLeaderboard() {
           <p className="mx-auto mt-4 max-w-2xl text-lg text-blue-100">
             See which universities are most trusted by employers
           </p>
+          {lastUpdated && (
+            <p className="mt-4 text-sm text-blue-200/90">
+              Data refreshed at {formatRefreshTime(lastUpdated)}
+            </p>
+          )}
         </div>
       </section>
 
@@ -83,28 +109,34 @@ export default function PublicLeaderboard() {
             </h2>
           </div>
           <div className="overflow-x-auto p-2">
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <thead>
-                <tr className="text-xs uppercase tracking-wide text-gray-500">
-                  <th className="px-4 py-3 font-medium">Rank</th>
-                  <th className="px-4 py-3 font-medium">Institution Name</th>
-                  <th className="px-4 py-3 font-medium">Credentials Issued</th>
-                  <th className="px-4 py-3 font-medium">Employer Verifications</th>
-                  <th className="px-4 py-3 font-medium">Unique Graduates Verified</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leaderboard.map((row, index) => (
-                  <tr key={row.id} className={`border-t border-gray-100 ${rankBorder(index)}`}>
-                    <td className="px-4 py-4 text-lg font-bold text-gray-900">{index + 1}</td>
-                    <td className="px-4 py-4 font-semibold text-gray-900">{row.name}</td>
-                    <td className="px-4 py-4 text-gray-600">{row.credentials_issued}</td>
-                    <td className="px-4 py-4 font-medium text-blue-700">{row.verifications_completed}</td>
-                    <td className="px-4 py-4 text-gray-600">{row.unique_graduates_verified}</td>
+            {leaderboard.length > 0 ? (
+              <table className="w-full min-w-[640px] text-left text-sm">
+                <thead>
+                  <tr className="text-xs uppercase tracking-wide text-gray-500">
+                    <th className="px-4 py-3 font-medium">Rank</th>
+                    <th className="px-4 py-3 font-medium">Institution Name</th>
+                    <th className="px-4 py-3 font-medium">Credentials Issued</th>
+                    <th className="px-4 py-3 font-medium">Employer Verifications</th>
+                    <th className="px-4 py-3 font-medium">Unique Graduates Verified</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {leaderboard.map((row, index) => (
+                    <tr key={row.id} className={`border-t border-gray-100 ${rankBorder(index)}`}>
+                      <td className="px-4 py-4 text-lg font-bold text-gray-900">{index + 1}</td>
+                      <td className="px-4 py-4 font-semibold text-gray-900">{row.name}</td>
+                      <td className="px-4 py-4 text-gray-600">{row.credentials_issued}</td>
+                      <td className="px-4 py-4 font-medium text-blue-700">{row.verifications_completed}</td>
+                      <td className="px-4 py-4 text-gray-600">{row.unique_graduates_verified}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="px-6 py-8 text-sm text-gray-500 italic">
+                Rankings update as employers verify credentials. Check back soon.
+              </p>
+            )}
           </div>
         </section>
 
@@ -112,30 +144,14 @@ export default function PublicLeaderboard() {
           <div className="border-b border-gray-100 bg-gray-50 px-6 py-4">
             <h2 className="flex items-center gap-2 text-xl font-semibold text-gray-900">
               <TrendingUp size={22} className="text-indigo-600" />
-              Most In-Demand Fields Nationwide
+              Department Demand Matrix
             </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Fields ranked by employer verification activity nationwide
+            </p>
           </div>
-          <div className="overflow-x-auto p-2">
-            <table className="w-full min-w-[480px] text-left text-sm">
-              <thead>
-                <tr className="text-xs uppercase tracking-wide text-gray-500">
-                  <th className="px-4 py-3 font-medium">Department</th>
-                  <th className="px-4 py-3 font-medium">Credentials Issued</th>
-                  <th className="px-4 py-3 font-medium">Verifications</th>
-                  <th className="px-4 py-3 font-medium">Average GPA</th>
-                </tr>
-              </thead>
-              <tbody>
-                {departments.map((row) => (
-                  <tr key={row.department} className="border-t border-gray-100">
-                    <td className="px-4 py-3 font-medium text-gray-900">{row.department}</td>
-                    <td className="px-4 py-3 text-gray-600">{row.credentials_issued}</td>
-                    <td className="px-4 py-3 text-gray-600">{row.verifications_completed}</td>
-                    <td className="px-4 py-3 text-gray-600">{row.average_gpa ?? '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="p-6">
+            <DepartmentDemandBadges departments={departments} limit={10} />
           </div>
         </section>
 
