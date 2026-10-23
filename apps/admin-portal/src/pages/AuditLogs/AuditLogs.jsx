@@ -1,11 +1,23 @@
-import { Badge, Loader } from '@ethiocred/ui';
 import { useCallback, useEffect, useState } from 'react';
-import { Copy, Check } from 'lucide-react';
+import {
+  FileSearch,
+  Copy,
+  Check,
+  Filter,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  Shield,
+  Clock,
+  User,
+  AlertCircle
+} from 'lucide-react';
+import { Badge, Loader, Button, PageHeader, EmptyState } from '@ethiocred/ui';
 import { get } from '../../services/api.js';
 import { formatDateTime } from '../../utils/formatDate.js';
 
 const ACTION_OPTIONS = [
-  { value: '', label: 'All actions' },
+  { value: '', label: 'All Actions' },
   { value: 'USER_LOGIN', label: 'User Login' },
   { value: 'USER_LOGOUT', label: 'User Logout' },
   { value: 'CREDENTIAL_ISSUED', label: 'Credential Issued' },
@@ -24,16 +36,8 @@ const HIGH_SIGNIFICANCE_ACTIONS = new Set([
   'INSTITUTION_REGISTERED',
   'INSTITUTION_APPROVED',
   'REGISTRAR_CREATED',
+  'CREDENTIAL_REVOKED',
 ]);
-
-const inputClass =
-  'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500';
-
-const btnPrimary =
-  'rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50';
-
-const btnSecondary =
-  'rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50';
 
 function formatAction(action) {
   if (!action) return '—';
@@ -46,9 +50,9 @@ function formatAction(action) {
 function roleBadge(role) {
   const map = {
     ADMIN: 'blue',
-    UNIVERSITY: 'gray',
-    STUDENT: 'gray',
-    EMPLOYER: 'gray',
+    UNIVERSITY: 'yellow',
+    STUDENT: 'green',
+    EMPLOYER: 'purple',
   };
   return <Badge variant={map[role] || 'gray'}>{role || 'SYSTEM'}</Badge>;
 }
@@ -56,13 +60,13 @@ function roleBadge(role) {
 function actionBadge(action) {
   if (HIGH_SIGNIFICANCE_ACTIONS.has(action)) {
     return (
-      <span className="inline-flex items-center rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-800">
+      <span className="inline-flex items-center rounded-full bg-navy-100 px-2.5 py-0.5 text-xs font-semibold text-navy-900 border border-navy-200">
         {formatAction(action)}
       </span>
     );
   }
   return (
-    <span className="text-sm font-medium text-gray-800">{formatAction(action)}</span>
+    <span className="text-xs font-medium text-slate-800">{formatAction(action)}</span>
   );
 }
 
@@ -70,7 +74,7 @@ function EntityIdCell({ entityId }) {
   const [copied, setCopied] = useState(false);
 
   if (!entityId) {
-    return <span className="text-gray-400">—</span>;
+    return <span className="text-slate-400">—</span>;
   }
 
   const truncated = entityId.length > 12 ? `${entityId.slice(0, 8)}…${entityId.slice(-4)}` : entityId;
@@ -87,168 +91,194 @@ function EntityIdCell({ entityId }) {
   };
 
   return (
-    <span className="inline-flex items-center gap-1.5 font-mono text-xs text-gray-600">
+    <span className="inline-flex items-center gap-1.5 font-mono text-xs text-slate-600">
       <span title={entityId}>{truncated}</span>
       <button
         type="button"
         onClick={handleCopy}
-        className="rounded p-0.5 text-gray-400 transition-colors hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="rounded p-0.5 text-slate-400 transition-colors hover:text-navy-900 focus:outline-none"
         aria-label="Copy entity ID"
       >
-        {copied ? <Check size={14} className="text-green-600" /> : <Copy size={14} />}
+        {copied ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
       </button>
     </span>
   );
 }
 
+const PAGE_SIZE = 20;
+
 export default function AuditLogs() {
   const [logs, setLogs] = useState([]);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(25);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const [action, setAction] = useState('');
+  const [userRole, setUserRole] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
-  const [appliedFilters, setAppliedFilters] = useState({
-    action: '',
-    startDate: '',
-    endDate: '',
-  });
-
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const [page, setPage] = useState(1);
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const params = new URLSearchParams({
-        page: String(page),
-        pageSize: String(pageSize),
-      });
-      if (appliedFilters.action) params.set('action', appliedFilters.action);
-      if (appliedFilters.startDate) params.set('startDate', appliedFilters.startDate);
-      if (appliedFilters.endDate) params.set('endDate', appliedFilters.endDate);
+      const params = {
+        limit: PAGE_SIZE,
+        offset: (page - 1) * PAGE_SIZE,
+      };
+      if (action) params.action = action;
+      if (userRole) params.user_role = userRole;
+      if (startDate) params.from = startDate;
+      if (endDate) params.to = endDate;
 
-      const { data } = await get(`/admin/audit-logs?${params.toString()}`);
-      const payload = data.data;
-      setLogs(payload.logs || []);
-      setTotal(payload.total || 0);
+      const { data } = await get('/admin/audit-logs', { params });
+      setLogs(data.data?.logs || data.data || []);
+      setTotal(data.data?.total ?? (data.data?.logs ? data.data.logs.length : (data.data || []).length));
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load audit logs');
     } finally {
       setLoading(false);
     }
-  }, [page, pageSize, appliedFilters]);
+  }, [action, userRole, startDate, endDate, page]);
 
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
 
-  const handleFilter = (e) => {
+  const handleApplyFilters = (e) => {
     e.preventDefault();
     setPage(1);
-    setAppliedFilters({ action, startDate, endDate });
+    fetchLogs();
   };
 
   const handleClearFilters = () => {
     setAction('');
+    setUserRole('');
     setStartDate('');
     setEndDate('');
-    setAppliedFilters({ action: '', startDate: '', endDate: '' });
     setPage(1);
   };
 
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
   return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900">Audit Logs</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Review system activity including logins, credential operations, and institution onboarding.
-        </p>
-      </div>
+    <div className="space-y-6">
+      <PageHeader
+        title="Security & System Audit Telemetry"
+        description="Immutable record of administrative, issuance, and verification security events."
+      />
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          {error}
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 flex items-center gap-3">
+          <AlertCircle className="h-5 w-5 text-rose-600 shrink-0" />
+          <p>{error}</p>
         </div>
       )}
 
+      {/* Filter Toolbar */}
       <form
-        onSubmit={handleFilter}
-        className="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5"
+        onSubmit={handleApplyFilters}
+        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4"
       >
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <label htmlFor="actionFilter" className="mb-1 block text-sm font-medium text-gray-700">
-              Action type
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              Action Type
             </label>
             <select
-              id="actionFilter"
               value={action}
               onChange={(e) => setAction(e.target.value)}
-              className={inputClass}
+              className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-200"
             >
               {ACTION_OPTIONS.map((opt) => (
-                <option key={opt.value || 'all'} value={opt.value}>
+                <option key={opt.value} value={opt.value}>
                   {opt.label}
                 </option>
               ))}
             </select>
           </div>
+
           <div>
-            <label htmlFor="startDate" className="mb-1 block text-sm font-medium text-gray-700">
-              Start date
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              Actor Role
+            </label>
+            <select
+              value={userRole}
+              onChange={(e) => setUserRole(e.target.value)}
+              className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-200"
+            >
+              <option value="">All Roles</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="UNIVERSITY">UNIVERSITY</option>
+              <option value="STUDENT">STUDENT</option>
+              <option value="EMPLOYER">EMPLOYER</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              From Date
             </label>
             <input
-              id="startDate"
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className={inputClass}
+              className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-200"
             />
           </div>
+
           <div>
-            <label htmlFor="endDate" className="mb-1 block text-sm font-medium text-gray-700">
-              End date
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              To Date
             </label>
             <input
-              id="endDate"
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className={inputClass}
+              className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-200"
             />
           </div>
-          <div className="flex items-end gap-2">
-            <button type="submit" className={btnPrimary}>
-              Apply Filters
-            </button>
-            <button type="button" onClick={handleClearFilters} className={btnSecondary}>
-              Clear
-            </button>
-          </div>
+        </div>
+
+        <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleClearFilters}
+            className="border-slate-300 text-slate-700"
+          >
+            Clear Filters
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            size="sm"
+            className="bg-navy-900 hover:bg-navy-800 text-white"
+          >
+            <Filter className="mr-1.5 h-3.5 w-3.5" />
+            Apply Filters
+          </Button>
         </div>
       </form>
 
+      {/* Logs Table */}
       {loading ? (
         <div className="flex justify-center py-20">
           <Loader />
         </div>
       ) : (
-        <>
-          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
-            <table className="min-w-full divide-y divide-gray-200">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200">
               <thead>
-                <tr className="bg-gray-50">
-                  {['Timestamp', 'Acting User', 'Action', 'Entity Type', 'Entity ID', 'IP Address'].map(
+                <tr className="bg-slate-50/80">
+                  {['Timestamp', 'Acting User & Role', 'Action', 'Entity Type', 'Entity ID', 'Client IP'].map(
                     (label) => (
                       <th
                         key={label}
-                        className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500"
+                        className="whitespace-nowrap px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500"
                       >
                         {label}
                       </th>
@@ -256,36 +286,36 @@ export default function AuditLogs() {
                   )}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-100">
                 {logs.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-4 py-10 text-center text-sm text-gray-500">
-                      No audit log entries found.
+                    <td colSpan={6} className="px-4 py-12 text-center text-sm text-slate-500">
+                      No security audit events recorded matching current criteria.
                     </td>
                   </tr>
                 ) : (
                   logs.map((log, rowIndex) => (
                     <tr
                       key={log.id}
-                      className={`transition-colors duration-200 hover:bg-blue-50 ${
-                        rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                      } ${HIGH_SIGNIFICANCE_ACTIONS.has(log.action) ? 'ring-1 ring-inset ring-indigo-100' : ''}`}
+                      className={`transition-colors duration-150 hover:bg-slate-50 ${
+                        rowIndex % 2 === 0 ? 'bg-white' : 'bg-slate-50/40'
+                      }`}
                     >
-                      <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
+                      <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-600">
                         {formatDateTime(log.created_at)}
                       </td>
-                      <td className="px-4 py-3 text-sm">
-                        <p className="font-medium text-gray-900">{log.full_name || 'System'}</p>
+                      <td className="px-4 py-3 text-xs">
+                        <p className="font-semibold text-slate-900">{log.full_name || 'System Actor'}</p>
                         <div className="mt-1">{roleBadge(log.user_role)}</div>
                       </td>
                       <td className="px-4 py-3">{actionBadge(log.action)}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-600">
+                      <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-600 font-mono">
                         {log.entity_type || '—'}
                       </td>
                       <td className="px-4 py-3">
                         <EntityIdCell entityId={log.entity_id} />
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-gray-600">
+                      <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-slate-500">
                         {log.ip_address || '—'}
                       </td>
                     </tr>
@@ -295,30 +325,38 @@ export default function AuditLogs() {
             </table>
           </div>
 
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-gray-600">
-              Page {page} of {totalPages} · {total} total result{total !== 1 ? 's' : ''}
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className={btnSecondary}
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
-                className={btnSecondary}
-              >
-                Next
-              </button>
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-t border-slate-100 pt-4 text-xs text-slate-600">
+              <p>
+                Showing Page <span className="font-semibold text-slate-900">{page}</span> of{' '}
+                <span className="font-semibold text-slate-900">{totalPages}</span> ({total} total events)
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="border-slate-300 text-slate-700"
+                >
+                  <ChevronLeft className="mr-1 h-3.5 w-3.5" />
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className="border-slate-300 text-slate-700"
+                >
+                  Next
+                  <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
-          </div>
-        </>
+          )}
+        </div>
       )}
     </div>
   );
