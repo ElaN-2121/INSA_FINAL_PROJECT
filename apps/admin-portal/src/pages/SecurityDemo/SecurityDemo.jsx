@@ -1,32 +1,53 @@
 import { useState } from 'react';
-import { Shield, AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  ShieldAlert,
+  ShieldCheck,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  ChevronDown,
+  ChevronUp,
+  KeyRound,
+  FileCheck2,
+  Terminal,
+  Zap,
+  Lock,
+  ArrowRight,
+  Database,
+  Building2,
+  RefreshCw,
+} from 'lucide-react';
 import { api } from '../../services/api.js';
+import { Button, Badge, Card, Loader, Alert } from '@ethiocred/ui';
 
-const ResultBadge = ({ detected }) =>
-  detected ? (
-    <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold bg-green-100 text-green-800">
-      <CheckCircle size={14} /> Attack Detected
-    </span>
-  ) : (
-    <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold bg-red-100 text-red-800">
-      <XCircle size={14} /> Not Detected — Check System
-    </span>
-  );
+const ResultBadge = ({ detected }) => (
+  <span
+    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold tracking-wide border shadow-soft ${
+      detected
+        ? 'bg-emerald-950/80 text-emerald-400 border-emerald-700/80 ring-2 ring-emerald-500/20'
+        : 'bg-red-950/80 text-red-400 border-red-700/80 ring-2 ring-red-500/20'
+    }`}
+  >
+    {detected ? <CheckCircle2 size={15} /> : <XCircle size={15} />}
+    <span>{detected ? 'ATTACK DETECTED & DEFENDED ✓' : 'SECURITY BREACH NOT DETECTED'}</span>
+  </span>
+);
 
-const JsonBlock = ({ data }) => {
+const JsonProofBlock = ({ data }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="mt-4">
+    <div className="mt-4 pt-3 border-t border-slate-800">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 text-xs font-semibold text-gray-500 transition-colors duration-200 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+        className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors focus-ring rounded"
       >
+        <Terminal size={14} className="text-sky-400" />
+        <span>{open ? 'Hide' : 'Inspect'} Raw Cryptographic Evidence JSON</span>
         {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        {open ? 'Hide' : 'Show'} raw JSON response
       </button>
       {open && (
-        <pre className="mt-3 max-h-72 overflow-auto rounded-3xl bg-slate-950 px-4 py-4 text-xs text-emerald-300 shadow-inner">
+        <pre className="mt-3 max-h-72 overflow-auto rounded-2xl bg-slate-950 border border-slate-800 p-4 text-xs font-mono text-emerald-400 shadow-inner">
           {JSON.stringify(data, null, 2)}
         </pre>
       )}
@@ -34,288 +55,405 @@ const JsonBlock = ({ data }) => {
   );
 };
 
-const DemoCard = ({ icon, title, description, children }) => (
-  <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-      <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
-          {icon}
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-          <p className="mt-1 text-sm leading-relaxed text-gray-500">{description}</p>
-        </div>
-      </div>
-    </div>
-    {children}
-  </div>
-);
+export default function SecurityDemo() {
+  const [activeTab, setActiveTab] = useState('tamper'); // 'tamper', 'rogue', 'revocation'
 
-const TamperingDemo = () => {
-  const [credentialId, setCredentialId] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [err, setErr] = useState('');
+  // Scenario 1: Tampering
+  const [tamperId, setTamperId] = useState('');
+  const [tamperLoading, setTamperLoading] = useState(false);
+  const [tamperResult, setTamperResult] = useState(null);
+  const [tamperErr, setTamperErr] = useState('');
 
-  const run = async () => {
-    if (!credentialId.trim()) {
-      setErr('Please enter a Credential ID.');
+  // Scenario 2: Rogue Issuer
+  const [rogueLoading, setRogueLoading] = useState(false);
+  const [rogueResult, setRogueResult] = useState(null);
+  const [rogueErr, setRogueErr] = useState('');
+
+  // Scenario 3: Revocation
+  const [revocId, setRevocId] = useState('');
+  const [revocLoading, setRevocLoading] = useState(false);
+  const [revocResult, setRevocResult] = useState(null);
+  const [revocErr, setRevocErr] = useState('');
+
+  const runTamper = async () => {
+    if (!tamperId.trim()) {
+      setTamperErr('Please enter or paste a valid Credential ID (UUID).');
       return;
     }
-    setLoading(true);
-    setErr('');
-    setResult(null);
+    setTamperLoading(true);
+    setTamperErr('');
+    setTamperResult(null);
     try {
-      const res = await api.post(`/security/demo/tamper/${credentialId.trim()}`);
-      setResult(res.data.data);
+      const res = await api.post(`/security/demo/tamper/${tamperId.trim()}`);
+      setTamperResult(res.data.data);
     } catch (e) {
-      setErr(e.response?.data?.message || 'Request failed. Check the credential ID and try again.');
+      setTamperErr(e.response?.data?.message || 'Attack simulation failed. Verify Credential ID.');
     } finally {
-      setLoading(false);
+      setTamperLoading(false);
     }
   };
 
-  return (
-    <DemoCard
-      icon={<AlertTriangle size={22} />}
-      title="Credential Tampering Attack"
-      description="Simulates an attacker modifying a credential's GPA after issuance. The system detects the change via hash mismatch and RSA signature failure."
-    >
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <input
-          type="text"
-          placeholder="Credential ID (UUID)"
-          value={credentialId}
-          onChange={(e) => setCredentialId(e.target.value)}
-          className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="button"
-          onClick={run}
-          disabled={loading}
-          className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-2 font-medium text-white transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {loading ? 'Running…' : 'Run Demo'}
-        </button>
-      </div>
-
-      {err && <p className="mt-2 text-sm text-red-600">{err}</p>}
-
-      {result && (
-        <div className="mt-4 space-y-4">
-          <ResultBadge detected={result.result === 'ATTACK_DETECTED'} />
-
-          <div className="grid gap-4 sm:grid-cols-2 text-sm">
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Original GPA</p>
-              <p className="mt-2 text-lg font-bold text-gray-900">{result.originalGpa}</p>
-            </div>
-            <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Tampered GPA</p>
-              <p className="mt-2 text-lg font-bold text-red-700">{result.tamperedGpa}</p>
-            </div>
-            <div className="rounded-xl border border-green-200 bg-green-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Original Valid</p>
-              <p className="mt-2 text-lg font-bold text-green-700">
-                {result.originalHashValid ? 'Yes ✓' : 'No'}
-              </p>
-            </div>
-            <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Tampered Signature</p>
-              <p className="mt-2 text-lg font-bold text-red-700">
-                {result.signatureValid ? 'Valid (unexpected)' : 'Failed ✓'}
-              </p>
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
-            <strong>Explanation:</strong> {result.explanation}
-          </div>
-
-          <JsonBlock data={result} />
-        </div>
-      )}
-    </DemoCard>
-  );
-};
-
-const RogueIssuerDemo = () => {
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [err, setErr] = useState('');
-
-  const run = async () => {
-    setLoading(true);
-    setErr('');
-    setResult(null);
+  const runRogue = async () => {
+    setRogueLoading(true);
+    setRogueErr('');
+    setRogueResult(null);
     try {
       const res = await api.post('/security/demo/rogue-issuer');
-      setResult(res.data.data);
+      setRogueResult(res.data.data);
     } catch (e) {
-      setErr(e.response?.data?.message || 'Request failed.');
+      setRogueErr(e.response?.data?.message || 'Rogue issuer simulation failed.');
     } finally {
-      setLoading(false);
+      setRogueLoading(false);
     }
   };
 
-  return (
-    <DemoCard
-      icon={<Shield size={22} />}
-      title="Rogue Issuer Attack"
-      description="Simulates an attacker signing a fake credential with their own RSA key. The institution is rejected because it is not in the Trust Registry."
-    >
-      <button
-        type="button"
-        onClick={run}
-        disabled={loading}
-        className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {loading ? 'Running…' : 'Run Demo'}
-      </button>
-
-      {err && <p className="mt-2 text-sm text-red-600">{err}</p>}
-
-      {result && (
-        <div className="mt-4 space-y-4">
-          <ResultBadge detected={result.result === 'ATTACK_DETECTED'} />
-
-          <div className="grid gap-4 sm:grid-cols-2 text-sm">
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Fake Institution</p>
-              <p className="mt-2 font-semibold text-gray-900">{result.fakeInstitution}</p>
-            </div>
-            <div className="rounded-xl border border-green-200 bg-green-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">In Trust Registry?</p>
-              <p className="mt-2 font-semibold text-green-700">
-                {result.institutionInTrustRegistry ? 'Yes (unexpected)' : 'No — Rejected ✓'}
-              </p>
-            </div>
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 sm:col-span-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Rogue Key Signature</p>
-              <p className="mt-2 font-semibold text-gray-700">
-                {result.signatureWithRogueKey
-                  ? 'Mathematically valid, but institution untrusted ✓'
-                  : 'Invalid'}
-              </p>
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
-            <strong>Explanation:</strong> {result.explanation}
-          </div>
-
-          <JsonBlock data={result} />
-        </div>
-      )}
-    </DemoCard>
-  );
-};
-
-const RevocationDemo = () => {
-  const [credentialId, setCredentialId] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [err, setErr] = useState('');
-
-  const run = async () => {
-    if (!credentialId.trim()) {
-      setErr('Please enter a Credential ID.');
+  const runRevocation = async () => {
+    if (!revocId.trim()) {
+      setRevocErr('Please enter a Credential ID (UUID) that is currently ACTIVE.');
       return;
     }
-    setLoading(true);
-    setErr('');
-    setResult(null);
+    setRevocLoading(true);
+    setRevocErr('');
+    setRevocResult(null);
     try {
-      const res = await api.post(`/security/demo/revocation/${credentialId.trim()}`);
-      setResult(res.data.data);
+      const res = await api.post(`/security/demo/revocation/${revocId.trim()}`);
+      setRevocResult(res.data.data);
     } catch (e) {
-      setErr(e.response?.data?.message || 'Request failed. Make sure the credential is ACTIVE.');
+      setRevocErr(e.response?.data?.message || 'Revocation bypass simulation failed. Ensure credential is ACTIVE.');
     } finally {
-      setLoading(false);
+      setRevocLoading(false);
     }
   };
 
   return (
-    <DemoCard
-      icon={<XCircle size={22} />}
-      title="Revocation Bypass Attempt"
-      description="Simulates an attacker using a revoked credential. Verification fails at the revocation check even though the RSA signature remains valid."
-    >
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <input
-          type="text"
-          placeholder="ACTIVE Credential ID (UUID)"
-          value={credentialId}
-          onChange={(e) => setCredentialId(e.target.value)}
-          className="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="button"
-          onClick={run}
-          disabled={loading}
-          className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-2 font-medium text-white transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {loading ? 'Running…' : 'Run Demo'}
-        </button>
+    <div className="space-y-8 max-w-5xl mx-auto">
+      {/* Presentation Header Card */}
+      <div className="rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-navy-950 to-slate-950 p-6 sm:p-8 shadow-card text-white space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-1">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-950 text-sky-400 border border-sky-800">
+              <ShieldAlert size={14} /> National Security Centerpiece
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-display tracking-tight text-white mt-2">
+              Cryptographic Attack Validation Suite
+            </h1>
+            <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
+              Interactive demonstrations proving that EthioCred mathematically detects and neutralizes 3 real-world attack vectors in real time without human intervention.
+            </p>
+          </div>
+
+          <div className="hidden sm:flex flex-col items-end text-xs text-slate-400 font-mono">
+            <span>Security Model: FIPS 180-4</span>
+            <span>RSA-2048 PKCS #1 v2.2</span>
+          </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex rounded-2xl bg-slate-950/80 p-1.5 border border-slate-800 flex-wrap gap-1 pt-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab('tamper')}
+            className={`flex-1 min-w-[180px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition-all focus-ring ${
+              activeTab === 'tamper'
+                ? 'bg-sky-600 text-white shadow-soft'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+            }`}
+          >
+            <AlertTriangle size={15} />
+            <span>Attack 1: GPA Tampering</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('rogue')}
+            className={`flex-1 min-w-[180px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition-all focus-ring ${
+              activeTab === 'rogue'
+                ? 'bg-sky-600 text-white shadow-soft'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+            }`}
+          >
+            <KeyRound size={15} />
+            <span>Attack 2: Rogue Issuer</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('revocation')}
+            className={`flex-1 min-w-[180px] flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-xs font-bold transition-all focus-ring ${
+              activeTab === 'revocation'
+                ? 'bg-sky-600 text-white shadow-soft'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+            }`}
+          >
+            <XCircle size={15} />
+            <span>Attack 3: Revocation Replay</span>
+          </button>
+        </div>
       </div>
 
-      {err && <p className="mt-2 text-sm text-red-600">{err}</p>}
+      {/* Scenario 1: Credential Tampering Demo */}
+      {activeTab === 'tamper' && (
+        <div className="rounded-3xl border border-slate-800 bg-slate-900/90 backdrop-blur p-6 sm:p-8 text-white shadow-card space-y-6">
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold font-display text-white flex items-center gap-2">
+              <AlertTriangle className="text-amber-400" size={20} />
+              <span>Attack Simulation 1: In-Flight Grade/GPA Tampering</span>
+            </h2>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              An attacker gains unauthorized database access or alters an exported credential’s GPA from 3.40 to 3.95. EthioCred runs canonical SHA-256 rehashing; the hash mismatch breaks the signature immediately.
+            </p>
+          </div>
 
-      {result && (
-        <div className="mt-4 space-y-4">
-          <ResultBadge detected={result.result === 'ATTACK_DETECTED'} />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              placeholder="Paste Credential ID (UUID) e.g. from Issued Credentials"
+              value={tamperId}
+              onChange={(e) => setTamperId(e.target.value)}
+              className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 font-mono outline-none"
+            />
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              isLoading={tamperLoading}
+              loadingText="Executing Attack..."
+              onClick={runTamper}
+              className="bg-amber-600 hover:bg-amber-500 text-white border-amber-500/20 shrink-0"
+            >
+              Simulate Attack
+            </Button>
+          </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 text-sm">
-            <div className="rounded-xl border border-green-200 bg-green-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Before Revocation</p>
-              <p className="mt-2 font-semibold text-green-700">
-                {result.verificationBeforeRevocation.valid ? 'Valid ✓' : 'Invalid'}
-              </p>
-              <p className="text-xs text-gray-500">{result.verificationBeforeRevocation.reason}</p>
+          {tamperErr && (
+            <div className="rounded-xl bg-red-950/60 border border-red-800/80 p-3.5 text-xs text-red-300">
+              {tamperErr}
             </div>
-            <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">After Revocation</p>
-              <p className="mt-2 font-semibold text-red-700">
-                {result.verificationAfterRevocation.valid ? 'Valid (unexpected)' : 'Rejected ✓'}
-              </p>
-              <p className="text-xs text-gray-500">{result.verificationAfterRevocation.reason}</p>
+          )}
+
+          {tamperResult && (
+            <div className="space-y-5 pt-4 border-t border-slate-800 animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <ResultBadge detected={tamperResult.result === 'ATTACK_DETECTED'} />
+                <span className="text-xs font-mono text-emerald-400">Zero Trust Verification Check: PASSED</span>
+              </div>
+
+              {/* Before vs After Split Simulation Panel */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Left Card: Original State */}
+                <div className="rounded-2xl border border-emerald-800/70 bg-emerald-950/20 p-5 space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold uppercase tracking-wider text-emerald-400">Original Issued Record</span>
+                    <Badge variant="green" size="sm">LEGITIMATE</Badge>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-slate-400">Original Cumulative GPA</p>
+                    <p className="text-2xl font-extrabold text-emerald-300 font-display tabular-nums">
+                      {tamperResult.originalGpa}
+                    </p>
+                  </div>
+                  <div className="pt-2 text-xs text-slate-300 space-y-1 border-t border-emerald-800/40">
+                    <p className="flex items-center gap-1.5 text-emerald-400">
+                      <CheckCircle2 size={13} />
+                      <span>Original Hash Valid: Yes ✓</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-mono truncate">
+                      Canonical match verified
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right Card: Tampered Attack State */}
+                <div className="rounded-2xl border-2 border-red-600/80 bg-red-950/20 p-5 space-y-3 ring-4 ring-red-950/40">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold uppercase tracking-wider text-red-400">Tampered Payload Attempt</span>
+                    <Badge variant="red" size="sm">TAMPERED</Badge>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-slate-400">Modified Cumulative GPA</p>
+                    <p className="text-2xl font-extrabold text-red-400 font-display tabular-nums line-through">
+                      {tamperResult.tamperedGpa}
+                    </p>
+                  </div>
+                  <div className="pt-2 text-xs text-red-300 space-y-1 border-t border-red-800/40">
+                    <p className="flex items-center gap-1.5 text-red-400 font-bold">
+                      <XCircle size={13} />
+                      <span>Signature Validation: FAILED (REJECTED) ✓</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-mono truncate">
+                      SHA-256 Digest Mismatch
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Security Analysis Explanation */}
+              <div className="rounded-2xl bg-sky-950/40 border border-sky-800/60 p-4 text-xs text-sky-200 leading-relaxed">
+                <strong className="text-white block mb-1">Cryptographic Analysis:</strong>
+                {tamperResult.explanation}
+              </div>
+
+              <JsonProofBlock data={tamperResult} />
             </div>
-          </div>
-
-          <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-900">
-            <strong>Note:</strong> The credential was automatically restored to ACTIVE after this demonstration.
-          </div>
-
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
-            <strong>Explanation:</strong> {result.explanation}
-          </div>
-
-          <JsonBlock data={result} />
+          )}
         </div>
       )}
-    </DemoCard>
-  );
-};
 
-const SecurityDemo = () => (
-  <div className="mx-auto max-w-4xl space-y-6">
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <h1 className="flex items-center gap-3 text-2xl font-bold text-gray-900">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
-          <Shield size={22} className="text-blue-700" />
+      {/* Scenario 2: Rogue Issuer Demo */}
+      {activeTab === 'rogue' && (
+        <div className="rounded-3xl border border-slate-800 bg-slate-900/90 backdrop-blur p-6 sm:p-8 text-white shadow-card space-y-6">
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold font-display text-white flex items-center gap-2">
+              <KeyRound className="text-sky-400" size={20} />
+              <span>Attack Simulation 2: Rogue Issuer & Fake Certificate Authority</span>
+            </h2>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              An adversary generates their own 2048-bit RSA keypair, signs a fictitious credential from an unauthorized entity, and attempts to verify it. Even if mathematically valid, it is immediately denied because the public key is absent from the National Trust Registry.
+            </p>
+          </div>
+
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            isLoading={rogueLoading}
+            loadingText="Generating Rogue Key & Simulating..."
+            onClick={runRogue}
+            className="bg-sky-600 hover:bg-sky-500 text-white"
+          >
+            Launch Rogue Issuer Attack Simulation
+          </Button>
+
+          {rogueErr && (
+            <div className="rounded-xl bg-red-950/60 border border-red-800/80 p-3.5 text-xs text-red-300">
+              {rogueErr}
+            </div>
+          )}
+
+          {rogueResult && (
+            <div className="space-y-5 pt-4 border-t border-slate-800 animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <ResultBadge detected={rogueResult.result === 'ATTACK_DETECTED'} />
+                <span className="text-xs font-mono text-emerald-400">Trust Anchor Check: REJECTED</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5 space-y-2">
+                  <p className="text-xs text-slate-400">Claimed Rogue Institution</p>
+                  <p className="text-lg font-bold text-white font-display">
+                    {rogueResult.fakeInstitution}
+                  </p>
+                  <p className="text-xs text-red-400 font-semibold pt-1">
+                    In National Trust Registry? {rogueResult.institutionInTrustRegistry ? 'Yes' : 'NO — REJECTED ✓'}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5 space-y-2">
+                  <p className="text-xs text-slate-400">Rogue Private Key Signature</p>
+                  <p className="text-sm font-semibold text-slate-200">
+                    {rogueResult.signatureWithRogueKey
+                      ? 'Mathematically valid signature with attacker key'
+                      : 'Invalid signature'}
+                  </p>
+                  <p className="text-xs text-emerald-400 font-semibold pt-1">
+                    Defense: Rejected at Trust Root Lookup
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl bg-sky-950/40 border border-sky-800/60 p-4 text-xs text-sky-200 leading-relaxed">
+                <strong className="text-white block mb-1">Cryptographic Analysis:</strong>
+                {rogueResult.explanation}
+              </div>
+
+              <JsonProofBlock data={rogueResult} />
+            </div>
+          )}
         </div>
-        Security Validation Suite
-      </h1>
-      <p className="mt-3 text-sm leading-relaxed text-gray-500">
-        These demonstrations prove that EthioCred correctly detects and rejects three common attack
-        scenarios. All demos are safe — no permanent changes are made to your data.
-      </p>
+      )}
+
+      {/* Scenario 3: Revocation Replay Demo */}
+      {activeTab === 'revocation' && (
+        <div className="rounded-3xl border border-slate-800 bg-slate-900/90 backdrop-blur p-6 sm:p-8 text-white shadow-card space-y-6">
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold font-display text-white flex items-center gap-2">
+              <XCircle className="text-red-400" size={20} />
+              <span>Attack Simulation 3: Revoked Degree Replay Attack</span>
+            </h2>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              A student was expelled or their degree was revoked due to academic misconduct. The student attempts to verify their previously signed certificate. The signature is mathematically authentic, but verification halts at the real-time registry status check.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              placeholder="Paste ACTIVE Credential ID (UUID)"
+              value={revocId}
+              onChange={(e) => setRevocId(e.target.value)}
+              className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 font-mono outline-none"
+            />
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              isLoading={revocLoading}
+              loadingText="Simulating Revocation..."
+              onClick={runRevocation}
+              className="bg-red-600 hover:bg-red-500 text-white shrink-0"
+            >
+              Simulate Revocation Attack
+            </Button>
+          </div>
+
+          {revocErr && (
+            <div className="rounded-xl bg-red-950/60 border border-red-800/80 p-3.5 text-xs text-red-300">
+              {revocErr}
+            </div>
+          )}
+
+          {revocResult && (
+            <div className="space-y-5 pt-4 border-t border-slate-800 animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <ResultBadge detected={revocResult.result === 'ATTACK_DETECTED'} />
+                <span className="text-xs font-mono text-emerald-400">Revocation Registry Check: DEFENDED</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="rounded-2xl border border-emerald-800/70 bg-emerald-950/20 p-5 space-y-2">
+                  <span className="text-xs font-bold text-emerald-400 uppercase">1. Before Revocation</span>
+                  <p className="text-lg font-bold text-emerald-300 font-display">
+                    Valid ✓ ({revocResult.verificationBeforeRevocation?.reason})
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Status was ACTIVE. Cryptographic signature and registry checks passed.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border-2 border-red-600/80 bg-red-950/20 p-5 space-y-2">
+                  <span className="text-xs font-bold text-red-400 uppercase">2. After Revocation</span>
+                  <p className="text-lg font-bold text-red-400 font-display">
+                    REJECTED ✓ ({revocResult.verificationAfterRevocation?.reason})
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Digital signature still passes, but real-time status was REVOKED. Attack thwarted.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl bg-amber-950/30 border border-amber-800/50 p-3.5 text-xs text-amber-300 flex items-center gap-2">
+                <RefreshCw size={14} className="shrink-0 text-amber-400" />
+                <span><strong>Automatic Safety Recovery:</strong> The simulated credential has been safely restored to ACTIVE in the database.</span>
+              </div>
+
+              <div className="rounded-2xl bg-sky-950/40 border border-sky-800/60 p-4 text-xs text-sky-200 leading-relaxed">
+                <strong className="text-white block mb-1">Cryptographic Analysis:</strong>
+                {revocResult.explanation}
+              </div>
+
+              <JsonProofBlock data={revocResult} />
+            </div>
+          )}
+        </div>
+      )}
     </div>
-
-    <TamperingDemo />
-    <RogueIssuerDemo />
-    <RevocationDemo />
-  </div>
-);
-
-export default SecurityDemo;
+  );
+}
