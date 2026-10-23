@@ -1,8 +1,8 @@
+import { PasswordInput } from '@ethiocred/ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Register from './Register.jsx';
-import PasswordInput from '../../components/PasswordInput/PasswordInput.jsx';
 
 const TOKEN_KEY = 'ethiocred_token';
 const USER_KEY = 'ethiocred_user';

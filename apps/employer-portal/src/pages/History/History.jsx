@@ -1,8 +1,6 @@
+import { Badge, Modal, Table } from '@ethiocred/ui';
 import { useMemo, useState } from 'react';
 import { formatDateTime } from '@ethiocred/utils';
-import Badge from '../../components/Badge/Badge.jsx';
-import Table from '../../components/Table/Table.jsx';
-import Modal from '../../components/Modal/Modal.jsx';
 import { getVerificationResults } from '../../utils/verificationCache.js';
 
 export default function History() {

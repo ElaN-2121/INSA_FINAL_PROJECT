@@ -1,9 +1,7 @@
+import { Badge, Loader, Table } from '@ethiocred/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { Building2, Copy, Plus, UserPlus } from 'lucide-react';
 import { get, post, patch } from '../../services/api.js';
-import Badge from '../../components/Badge/Badge.jsx';
-import Table from '../../components/Table/Table.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 import { formatDate } from '../../utils/formatDate.js';
 
 function statusBadge(status) {

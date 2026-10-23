@@ -1,8 +1,8 @@
+import { Loader } from '@ethiocred/ui';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, GraduationCap, ShieldCheck, XCircle } from 'lucide-react';
 import { get, post, formatDate, formatDateTime } from '@ethiocred/utils';
-import Loader from '../../components/Loader/Loader.jsx';
 import { saveVerificationResult } from '../../utils/verificationCache.js';
 
 const FAILURE_MESSAGES = {

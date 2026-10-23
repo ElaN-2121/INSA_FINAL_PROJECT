@@ -1,8 +1,8 @@
+import { Loader } from '@ethiocred/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
 import { get } from '../../services/api.js';
-import Loader from '../../components/Loader/Loader.jsx';
 
 export default function Dashboard() {
   const [institutions, setInstitutions] = useState([]);

@@ -8,7 +8,11 @@
     ".": "./index.js",
     "./preset": "./tailwind-preset.js"
   },
+  "dependencies": {
+    "lucide-react": "^0.469.0"
+  },
   "peerDependencies": {
-    "react": "^18.0.0 || ^19.0.0"
+    "react": "^18.0.0 || ^19.0.0",
+    "react-router-dom": "^6.0.0 || ^7.0.0"
   }
 }

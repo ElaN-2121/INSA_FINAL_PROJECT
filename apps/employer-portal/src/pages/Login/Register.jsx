@@ -1,7 +1,7 @@
+import { PasswordInput } from '@ethiocred/ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import PasswordInput from '../../components/PasswordInput/PasswordInput.jsx';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

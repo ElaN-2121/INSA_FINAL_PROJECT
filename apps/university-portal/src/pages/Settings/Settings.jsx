@@ -1,9 +1,8 @@
+import { Badge, Loader } from '@ethiocred/ui';
 import { useEffect, useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { get, formatDateTime } from '@ethiocred/utils';
 import { useAuth } from '../../context/AuthContext.jsx';
-import Badge from '../../components/Badge/Badge.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 
 function statusBadge(status) {
   if (status === 'ACTIVE') return <Badge variant="green">ACTIVE</Badge>;

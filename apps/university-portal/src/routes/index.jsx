@@ -1,8 +1,8 @@
+import { Loader } from '@ethiocred/ui';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import AuthLayout from '../layouts/AuthLayout.jsx';
 import DashboardLayout from '../layouts/DashboardLayout.jsx';
-import Loader from '../components/Loader/Loader.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import Landing from '../pages/Landing/Landing.jsx';
 import Login from '../pages/Login/Login.jsx';

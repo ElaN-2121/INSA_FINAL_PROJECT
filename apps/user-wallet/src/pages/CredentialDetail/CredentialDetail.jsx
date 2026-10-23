@@ -1,10 +1,9 @@
+import { Badge, Loader } from '@ethiocred/ui';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import QRCode from 'qrcode';
 import { ArrowLeft, Download } from 'lucide-react';
 import { get, formatDate } from '@ethiocred/utils';
-import Badge from '../../components/Badge/Badge.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 
 function statusBadge(status) {
   if (status === 'ACTIVE') return <Badge variant="green">ACTIVE</Badge>;

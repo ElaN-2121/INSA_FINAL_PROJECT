@@ -1,8 +1,7 @@
+import { Badge, Loader } from '@ethiocred/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { Copy, Check } from 'lucide-react';
 import { get } from '../../services/api.js';
-import Badge from '../../components/Badge/Badge.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 import { formatDateTime } from '../../utils/formatDate.js';
 
 const ACTION_OPTIONS = [

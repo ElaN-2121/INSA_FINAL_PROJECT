@@ -1,9 +1,8 @@
+import { Badge, Loader } from '@ethiocred/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { get, formatDate } from '@ethiocred/utils';
 import { useAuth } from '../../context/AuthContext.jsx';
-import Badge from '../../components/Badge/Badge.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 
 function statusBadge(status) {
   if (status === 'ACTIVE') return <Badge variant="green">ACTIVE</Badge>;

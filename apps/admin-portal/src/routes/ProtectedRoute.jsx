@@ -1,5 +1,5 @@
+import { Loader } from '@ethiocred/ui';
 import { Navigate } from 'react-router-dom';
-import Loader from '../components/Loader/Loader.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 function roleMatches(userRole, requiredRole) {

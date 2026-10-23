@@ -1,10 +1,8 @@
+import { Loader, Modal, Table } from '@ethiocred/ui';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { get, post } from '@ethiocred/utils';
 import { useAuth } from '../../context/AuthContext.jsx';
-import Table from '../../components/Table/Table.jsx';
-import Modal from '../../components/Modal/Modal.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 
 export default function StagingDashboard() {
   const { batchId } = useParams();

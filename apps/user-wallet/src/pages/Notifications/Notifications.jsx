@@ -1,6 +1,6 @@
+import { Loader } from '@ethiocred/ui';
 import { useEffect, useState } from 'react';
 import { get, patch, formatDateTime, timeAgo } from '@ethiocred/utils';
-import Loader from '../../components/Loader/Loader.jsx';
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);

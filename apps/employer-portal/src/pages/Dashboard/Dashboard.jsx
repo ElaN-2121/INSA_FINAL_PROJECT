@@ -1,8 +1,6 @@
+import { Badge, Loader, Table } from '@ethiocred/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { get, formatDateTime } from '@ethiocred/utils';
-import Badge from '../../components/Badge/Badge.jsx';
-import Table from '../../components/Table/Table.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 import { getVerificationResults } from '../../utils/verificationCache.js';
 
 export default function Dashboard() {

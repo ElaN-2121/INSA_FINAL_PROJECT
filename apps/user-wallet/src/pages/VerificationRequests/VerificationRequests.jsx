@@ -1,7 +1,6 @@
+import { Badge, Loader } from '@ethiocred/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { get, post, formatDate, formatDateTime } from '@ethiocred/utils';
-import Badge from '../../components/Badge/Badge.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 
 function requestStatusBadge(status) {
   const map = {

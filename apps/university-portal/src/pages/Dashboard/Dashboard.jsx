@@ -1,9 +1,7 @@
+import { Badge, Loader, Table } from '@ethiocred/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get, formatDate } from '@ethiocred/utils';
-import Badge from '../../components/Badge/Badge.jsx';
-import Table from '../../components/Table/Table.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 
 function statusBadge(status) {
   if (status === 'ACTIVE') return <Badge variant="green">ACTIVE</Badge>;

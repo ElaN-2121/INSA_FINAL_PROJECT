@@ -1,9 +1,8 @@
+import { Loader, Table } from '@ethiocred/ui';
 import { useCallback, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, FileText } from 'lucide-react';
 import { api } from '@ethiocred/utils';
-import Loader from '../../components/Loader/Loader.jsx';
-import Table from '../../components/Table/Table.jsx';
 
 export default function UploadBatch() {
   const [file, setFile] = useState(null);

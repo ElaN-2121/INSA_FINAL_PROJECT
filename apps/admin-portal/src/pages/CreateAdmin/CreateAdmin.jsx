@@ -1,7 +1,7 @@
+import { PasswordInput } from '@ethiocred/ui';
 import { useState } from 'react';
 import { UserPlus } from 'lucide-react';
 import { post } from '../../services/api.js';
-import PasswordInput from '../../components/PasswordInput/PasswordInput.jsx';
 
 const inputClass =
   'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500';

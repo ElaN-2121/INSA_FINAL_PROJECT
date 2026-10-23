@@ -1,10 +1,7 @@
+import { Badge, Loader, SearchInput, Table } from '@ethiocred/ui';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get, post, formatDate } from '@ethiocred/utils';
-import Badge from '../../components/Badge/Badge.jsx';
-import Table from '../../components/Table/Table.jsx';
-import SearchInput from '../../components/SearchInput/SearchInput.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 
 const PAGE_SIZE = 10;
 
