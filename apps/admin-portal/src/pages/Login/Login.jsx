@@ -1,7 +1,8 @@
-import { PasswordInput } from '@ethiocred/ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { Button, Input, PasswordInput, Alert } from '@ethiocred/ui';
+import { Shield, LogIn } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -27,60 +28,64 @@ export default function Login() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <p className="text-sm font-semibold uppercase tracking-wider text-blue-700">Admin Portal</p>
-        <h2 className="mt-3 text-2xl font-bold text-gray-900">Administrator Sign In</h2>
-        <p className="mt-2 text-sm text-gray-500">
-          EthioCred platform administration — institutions, trust registry, and security.
+      <div className="space-y-1 text-center sm:text-left">
+        <h2 className="text-2xl font-bold tracking-tight text-white font-display">
+          Administrator Sign In
+        </h2>
+        <p className="text-sm text-slate-400">
+          Enter root credentials to access the National Trust Registry console.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <Alert variant="danger" onClose={() => setError('')}>
           {error}
-        </div>
+        </Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            autoComplete="username"
-            placeholder="admin@ethiocred.et"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          id="email"
+          label="Root Administrator Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="username"
+          placeholder="admin@ethiocred.et"
+          className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 focus:border-sky-500 focus:ring-sky-500/20"
+        />
 
-        <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <PasswordInput
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            autoComplete="current-password"
-            placeholder="Enter your password"
-          />
-        </div>
+        <PasswordInput
+          id="password"
+          label="Security Key / Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+          placeholder="Enter master password"
+          className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 focus:border-sky-500 focus:ring-sky-500/20"
+        />
 
-        <button
+        <Button
           type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          variant="primary"
+          size="md"
+          className="w-full mt-2 bg-sky-600 hover:bg-sky-500 text-white border-sky-500"
+          isLoading={submitting}
+          loadingText="Authenticating Root Clearance..."
+          rightIcon={LogIn}
         >
-          {submitting ? 'Signing in...' : 'Sign In'}
-        </button>
+          Sign In to Authority Console
+        </Button>
       </form>
+
+      <div className="pt-4 border-t border-slate-800 text-center">
+        <p className="text-xs text-slate-500 flex items-center justify-center gap-1.5">
+          <Shield size={13} className="text-sky-400" />
+          <span>Hardware MFA and IP audit logging enforced.</span>
+        </p>
+      </div>
     </div>
   );
 }

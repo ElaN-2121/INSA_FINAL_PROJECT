@@ -1,7 +1,8 @@
-import { PasswordInput } from '@ethiocred/ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { Button, Input, PasswordInput, Alert } from '@ethiocred/ui';
+import { LogIn } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -27,60 +28,62 @@ export default function Login() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <p className="text-sm font-semibold uppercase tracking-wider text-blue-700">University Portal</p>
-        <h2 className="mt-3 text-2xl font-bold text-gray-900">Sign in to EthioCred</h2>
-        <p className="mt-2 text-sm text-gray-500">
-          Access secure credential issuance, verification, and administration.
+      <div className="space-y-1 text-center sm:text-left">
+        <h2 className="text-2xl font-bold tracking-tight text-navy-950 font-display">
+          Registrar Sign In
+        </h2>
+        <p className="text-sm text-slate-500">
+          Authenticate to manage batches and cryptographic graduation records.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <Alert variant="danger" onClose={() => setError('')}>
           {error}
-        </div>
+        </Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            autoComplete="username"
-            placeholder="you@example.com"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          id="email"
+          label="Institutional Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="username"
+          placeholder="registrar@aau.et"
+        />
 
-        <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <PasswordInput
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            autoComplete="current-password"
-            placeholder="Enter your password"
-          />
-        </div>
+        <PasswordInput
+          id="password"
+          label="Account Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+          placeholder="Enter your registrar password"
+        />
 
-        <button
+        <Button
           type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          variant="primary"
+          size="md"
+          className="w-full mt-2"
+          isLoading={submitting}
+          loadingText="Authenticating Registrar..."
+          rightIcon={LogIn}
         >
-          {submitting ? 'Signing in...' : 'Sign In'}
-        </button>
+          Sign In to Registrar Console
+        </Button>
       </form>
+
+      <div className="pt-4 border-t border-slate-100 text-center">
+        <p className="text-xs text-slate-500">
+          Need registrar credentials? Contact the{' '}
+          <span className="font-semibold text-slate-700">INSA Trust Registry Administrator</span>.
+        </p>
+      </div>
     </div>
   );
 }

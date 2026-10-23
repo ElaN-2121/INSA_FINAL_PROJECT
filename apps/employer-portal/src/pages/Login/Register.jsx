@@ -1,7 +1,8 @@
-import { PasswordInput } from '@ethiocred/ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { Button, Input, PasswordInput, Alert } from '@ethiocred/ui';
+import { ArrowLeft, Building2 } from 'lucide-react';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -52,16 +53,12 @@ export default function Register({ onBack }) {
 
     setSubmitting(true);
     try {
-      const user = await register({
+      await register({
         full_name: fullName.trim(),
         email: email.trim(),
         password,
         company_name: companyName.trim(),
       });
-      if (user.role !== 'EMPLOYER') {
-        window.location.href = '/unauthorized';
-        return;
-      }
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
@@ -72,114 +69,115 @@ export default function Register({ onBack }) {
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <p className="text-sm font-semibold uppercase tracking-wider text-blue-700">Employer Portal</p>
-        <h2 className="mt-3 text-2xl font-bold text-gray-900">Register Your Company</h2>
-        <p className="mt-2 text-sm text-gray-500">
-          Create an account to verify student credentials securely.
+      <div className="space-y-1 text-center sm:text-left">
+        <h2 className="text-2xl font-bold tracking-tight text-navy-950 font-display">
+          Register Organization
+        </h2>
+        <p className="text-sm text-slate-500">
+          Create an employer verification account to verify candidate credentials.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <Alert variant="danger" onClose={() => setError('')}>
           {error}
-        </div>
+        </Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label htmlFor="fullName" className="mb-1 block text-sm font-medium text-gray-700">
-            Full Name
-          </label>
-          <input
-            id="fullName"
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            placeholder="Your full name"
-          />
-        </div>
-        <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            placeholder="you@company.com"
-          />
-        </div>
-        <div>
-          <label htmlFor="companyName" className="mb-1 block text-sm font-medium text-gray-700">
-            Company Name
-          </label>
-          <input
-            id="companyName"
-            type="text"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            placeholder="Your company name"
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <PasswordInput
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            minLength={8}
-            placeholder="At least 8 characters"
-          />
-          <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters</p>
-        </div>
-        <div>
-          <label htmlFor="confirmPassword" className="mb-1 block text-sm font-medium text-gray-700">
-            Confirm Password
-          </label>
-          <PasswordInput
-            id="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            onBlur={validateConfirmPassword}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            placeholder="Re-enter your password"
-          />
-          {confirmError && (
-            <p className="mt-1 text-xs text-red-600">{confirmError}</p>
-          )}
-        </div>
-        <button
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          id="companyName"
+          label="Company / Organization Name"
+          type="text"
+          value={companyName}
+          onChange={(e) => setCompanyName(e.target.value)}
+          required
+          placeholder="e.g. Commercial Bank of Ethiopia"
+        />
+
+        <Input
+          id="fullName"
+          label="Contact Person Name"
+          type="text"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          required
+          placeholder="HR Representative Name"
+        />
+
+        <Input
+          id="email"
+          label="Corporate Work Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+          placeholder="hr@company.com"
+        />
+
+        <PasswordInput
+          id="password"
+          label="Password (min 8 characters)"
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (confirmPassword) setConfirmError(e.target.value !== confirmPassword ? 'Passwords do not match.' : '');
+          }}
+          required
+          autoComplete="new-password"
+          placeholder="Create a secure password"
+        />
+
+        <PasswordInput
+          id="confirmPassword"
+          label="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => {
+            setConfirmPassword(e.target.value);
+            setConfirmError(password !== e.target.value ? 'Passwords do not match.' : '');
+          }}
+          onBlur={validateConfirmPassword}
+          error={confirmError}
+          required
+          autoComplete="new-password"
+          placeholder="Confirm your password"
+        />
+
+        <Button
           type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          variant="primary"
+          size="md"
+          className="w-full mt-2"
+          isLoading={submitting}
+          loadingText="Registering Organization..."
+          rightIcon={Building2}
         >
-          {submitting ? 'Registering...' : 'Register Company'}
-        </button>
+          Create Employer Account
+        </Button>
       </form>
 
-      <p className="text-center text-sm text-gray-600">
-        Already have an account?{' '}
+      <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
         <button
           type="button"
           onClick={onBack}
-          className="font-medium text-blue-600 transition-colors hover:text-blue-700 focus:outline-none focus:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-navy-900 transition-colors focus-ring rounded"
         >
-          Log in
+          <ArrowLeft size={14} />
+          <span>Back to sign in</span>
         </button>
-      </p>
+
+        <p className="text-xs text-slate-500">
+          Already registered?{' '}
+          <button
+            type="button"
+            onClick={onBack}
+            className="font-semibold text-navy-900 hover:underline focus-ring rounded"
+          >
+            Log in
+          </button>
+        </p>
+      </div>
     </div>
   );
 }
