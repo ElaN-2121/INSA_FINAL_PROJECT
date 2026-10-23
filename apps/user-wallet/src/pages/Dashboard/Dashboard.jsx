@@ -135,25 +135,25 @@ export default function Dashboard() {
       {/* Metrics Row */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <StatCard
-          title="Issued Credentials"
+          label="Total Credentials"
           value={credentials.length}
           icon={Award}
-          trend={{ value: 'Cryptographically sealed', positive: true }}
+          helpText="Cryptographically sealed"
         />
         <StatCard
-          title="Active & Verifiable"
+          label="Active & Verifiable"
           value={activeCredentials.length}
           icon={CheckCircle2}
-          trend={{ value: 'Accredited in Trust Registry', positive: true }}
+          helpText="Accredited in Trust Registry"
         />
         <StatCard
-          title="Pending Consent Requests"
+          label="Pending Consent Requests"
           value={pendingRequests.length}
           icon={Clock}
-          trend={
+          helpText={
             pendingRequests.length > 0
-              ? { value: `${pendingRequests.length} awaiting your approval`, positive: false }
-              : { value: 'All requests reviewed', positive: true }
+              ? `${pendingRequests.length} awaiting your approval`
+              : 'All requests reviewed'
           }
         />
       </div>

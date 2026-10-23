@@ -45,7 +45,7 @@ export default function AuthLayout({ children }) {
             </div>
             <div className="flex items-start gap-3 text-sm text-slate-200">
               <Database size={18} className="text-sky-400 shrink-0 mt-0.5" />
-              <span><strong>Immutable Audit Logging:</strong> Complete cryptographic audit trail of all verification queries and registrar actions.</span>
+              <span><strong>Tamper-Evident Audit Logging:</strong> Complete cryptographic audit trail of all verification queries and registrar actions.</span>
             </div>
             <div className="flex items-start gap-3 text-sm text-slate-200">
               <ShieldAlert size={18} className="text-sky-400 shrink-0 mt-0.5" />
@@ -56,7 +56,7 @@ export default function AuthLayout({ children }) {
 
         <div className="relative z-10 flex items-center justify-between text-xs text-slate-400 pt-6 border-t border-slate-800">
           <span>Security Clearance Required</span>
-          <span>Information Network Security Administration (INSA)</span>
+          <span>EthioCred Trust Administration</span>
         </div>
       </div>
 
@@ -80,7 +80,7 @@ export default function AuthLayout({ children }) {
 
           <div className="mt-8 text-center text-xs text-slate-500 lg:hidden">
             <p>Federal Democratic Republic of Ethiopia</p>
-            <p className="mt-0.5">INSA · National Academic Trust Root</p>
+            <p className="mt-0.5">EthioCred · National Academic Trust Root</p>
           </div>
         </div>
       </div>

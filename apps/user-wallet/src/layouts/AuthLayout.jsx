@@ -50,7 +50,7 @@ export default function AuthLayout({ children }) {
             </div>
             <div className="flex items-start gap-3 text-sm text-slate-200">
               <CheckCircle2 size={18} className="text-emerald-400 shrink-0 mt-0.5" />
-              <span><strong>Instant Offline QR Verification:</strong> Generate digitally signed QR codes for tamper-free in-person verification.</span>
+              <span><strong>Instant QR Verification:</strong> Generate digitally signed QR codes for fast verification.</span>
             </div>
           </div>
         </div>

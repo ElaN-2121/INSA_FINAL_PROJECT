@@ -45,7 +45,7 @@ export default function AuthLayout({ children }) {
             </div>
             <div className="flex items-start gap-3 text-sm text-slate-200">
               <KeyRound size={18} className="text-amber-400 shrink-0 mt-0.5" />
-              <span><strong>Hardware-Anchored RSA-2048 Signing:</strong> Cryptographic mathematical proofs eliminate diploma fraud completely.</span>
+              <span><strong>RSA-2048 Digital Signing:</strong> Cryptographic mathematical proofs eliminate diploma fraud completely.</span>
             </div>
             <div className="flex items-start gap-3 text-sm text-slate-200">
               <Award size={18} className="text-amber-400 shrink-0 mt-0.5" />
@@ -56,7 +56,7 @@ export default function AuthLayout({ children }) {
 
         <div className="relative z-10 flex items-center justify-between text-xs text-slate-400 pt-6 border-t border-navy-900">
           <span>Accredited Institutional Console</span>
-          <span>Ministry of Education & INSA Trust Grid</span>
+          <span>EthioCred Trust Registry</span>
         </div>
       </div>
 
@@ -80,7 +80,7 @@ export default function AuthLayout({ children }) {
 
           <div className="mt-8 text-center text-xs text-slate-400 lg:hidden">
             <p>Federal Democratic Republic of Ethiopia</p>
-            <p className="mt-0.5">Ministry of Education · National Trust Registry</p>
+            <p className="mt-0.5">EthioCred · National Trust Registry</p>
           </div>
         </div>
       </div>

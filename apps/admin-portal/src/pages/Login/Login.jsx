@@ -48,30 +48,30 @@ export default function Login() {
           id="email"
           label="Root Administrator Email"
           type="email"
+          tone="dark"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
           autoComplete="username"
           placeholder="admin@ethiocred.et"
-          className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 focus:border-sky-500 focus:ring-sky-500/20"
         />
 
         <PasswordInput
           id="password"
           label="Security Key / Password"
+          tone="dark"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
           autoComplete="current-password"
           placeholder="Enter master password"
-          className="bg-slate-900 border-slate-700 text-white placeholder:text-slate-500 focus:border-sky-500 focus:ring-sky-500/20"
         />
 
         <Button
           type="submit"
           variant="primary"
           size="md"
-          className="w-full mt-2 bg-sky-600 hover:bg-sky-500 text-white border-sky-500"
+          className="w-full mt-2 bg-sky-600 hover:bg-sky-500 text-white border-sky-500 shadow-sm"
           isLoading={submitting}
           loadingText="Authenticating Root Clearance..."
           rightIcon={LogIn}
@@ -81,9 +81,9 @@ export default function Login() {
       </form>
 
       <div className="pt-4 border-t border-slate-800 text-center">
-        <p className="text-xs text-slate-500 flex items-center justify-center gap-1.5">
+        <p className="text-xs text-slate-400 flex items-center justify-center gap-1.5">
           <Shield size={13} className="text-sky-400" />
-          <span>Hardware MFA and IP audit logging enforced.</span>
+          <span>All administrator actions are recorded in the audit log.</span>
         </p>
       </div>
     </div>

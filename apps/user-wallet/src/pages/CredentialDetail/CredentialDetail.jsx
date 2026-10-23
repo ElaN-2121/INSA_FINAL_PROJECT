@@ -184,7 +184,7 @@ export default function CredentialDetail() {
                   <h3 className="text-sm sm:text-base font-extrabold text-navy-950 font-display">
                     {credential.institution_name}
                   </h3>
-                  <p className="text-[11px] text-slate-500">Ministry of Education Accredited Institution</p>
+                  <p className="text-[11px] text-slate-500">EthioCred Accredited Institution</p>
                 </div>
               </div>
 

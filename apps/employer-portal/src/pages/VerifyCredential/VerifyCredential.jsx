@@ -276,7 +276,7 @@ export default function VerifyCredential() {
               </div>
 
               <div className="flex sm:flex-col items-end justify-between sm:justify-center text-xs text-slate-300">
-                <span className="font-semibold text-white">INSA Registry Root</span>
+                <span className="font-semibold text-white">EthioCred Registry Root</span>
                 <span className="text-[11px] text-slate-400 font-mono">SHA-256 / RSA-2048</span>
               </div>
             </div>
@@ -358,7 +358,7 @@ export default function VerifyCredential() {
                     <img src={mark} alt="" className="h-10 w-10 object-contain" />
                     <div>
                       <p className="font-bold text-navy-950 font-display">National Trust Authority Anchor</p>
-                      <p className="text-[11px] text-slate-500">Ministry of Education · INSA Root Key Registry</p>
+                      <p className="text-[11px] text-slate-500">EthioCred Trust Registry</p>
                     </div>
                   </div>
                   <div className="text-right">

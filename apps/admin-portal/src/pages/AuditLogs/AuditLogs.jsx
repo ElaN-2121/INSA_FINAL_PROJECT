@@ -166,7 +166,7 @@ export default function AuditLogs() {
     <div className="space-y-6">
       <PageHeader
         title="Security & System Audit Telemetry"
-        description="Immutable record of administrative, issuance, and verification security events."
+        description="Tamper-evident record of administrative, issuance, and verification security events."
       />
 
       {error && (

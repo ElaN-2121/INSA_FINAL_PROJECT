@@ -126,26 +126,27 @@ export default function Dashboard() {
       {/* Primary Metrics Row */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
-          title="Total Institutions"
+          label="Total Institutions"
           value={counts.total}
           icon={Building2}
-          trend={{ value: 'Accredited & pending', positive: true }}
+          helpText="Accredited & pending"
         />
         <StatCard
-          title="Active Trust Registry Members"
+          label="Active Trust Members"
           value={counts.active}
           icon={CheckCircle2}
-          trend={{ value: 'Authorized to sign credentials', positive: true }}
+          helpText="Authorized to sign credentials"
         />
         <StatCard
-          title="Pending MoE Review"
+          label="Pending Review"
           value={counts.pending}
           icon={Clock}
-          trend={
+          helpText={
             counts.pending > 0
-              ? { value: `${counts.pending} awaiting clearance`, positive: false }
-              : { value: 'Zero backlog', positive: true }
+              ? `${counts.pending} awaiting clearance`
+              : 'Zero backlog'
           }
+          trend={counts.pending > 0 ? { value: `${counts.pending} pending`, positive: false } : { value: 'Zero backlog', positive: true }}
         />
       </div>
 
@@ -153,22 +154,22 @@ export default function Dashboard() {
       {stats && (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
-            title="Total Registered Users"
+            label="Total Registered Users"
             value={stats.users}
             icon={Users}
-            trend={{ value: 'Students, registrars & employers', positive: true }}
+            helpText="Students, registrars & employers"
           />
           <StatCard
-            title="Total Sealed Credentials"
+            label="Total Sealed Credentials"
             value={stats.credentials}
             icon={Award}
-            trend={{ value: 'RSA-signed diplomas stored', positive: true }}
+            helpText="RSA-signed diplomas stored"
           />
           <StatCard
-            title="Verification Inquiries"
+            label="Verification Inquiries"
             value={stats.verifications}
             icon={ShieldCheck}
-            trend={{ value: 'Cryptographic checks completed', positive: true }}
+            helpText="Cryptographic checks completed"
           />
         </div>
       )}

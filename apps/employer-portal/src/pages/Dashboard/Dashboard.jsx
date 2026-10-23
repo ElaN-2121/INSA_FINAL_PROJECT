@@ -131,31 +131,37 @@ export default function Dashboard() {
       )}
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Verifications Run"
-          value={stats.total}
-          icon={FileSearch}
-          trend={{ value: 'Real-time cryptographic checks', positive: true }}
-        />
-        <StatCard
-          title="Authentic / Verified"
-          value={stats.verified}
-          icon={CheckCircle2}
-          trend={{ value: '100% signature integrity', positive: true }}
-        />
-        <StatCard
-          title="Failed / Tampered"
-          value={stats.failed}
-          icon={XCircle}
-          trend={{ value: 'Tampering / revocation flagged', positive: false }}
-        />
-        <StatCard
-          title="Student Consent Requests"
-          value={stats.requests}
-          icon={UserCheck}
-          trend={{ value: 'Consent-based checks', positive: true }}
-        />
+      <div className="space-y-2">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Verifications Run"
+            value={stats.total}
+            icon={FileSearch}
+            helpText="Cryptographic checks run"
+          />
+          <StatCard
+            label="Verified"
+            value={stats.verified}
+            icon={CheckCircle2}
+            helpText="100% signature integrity"
+          />
+          <StatCard
+            label="Failed"
+            value={stats.failed}
+            icon={XCircle}
+            helpText="Tampering / revocation flagged"
+            trend={{ value: 'Tampering / revocation flagged', positive: false }}
+          />
+          <StatCard
+            label="Consent Requests"
+            value={stats.requests}
+            icon={UserCheck}
+            helpText="Candidate consent records"
+          />
+        </div>
+        <p className="text-right text-xs text-slate-500 font-medium pr-1">
+          Counts reflect this browser session.
+        </p>
       </div>
 
       {/* Quick Launchpad Cards */}

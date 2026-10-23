@@ -340,9 +340,9 @@ export default function Landing() {
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-navy-50 text-navy-900 border border-navy-100">
                 <FileText size={20} />
               </div>
-              <h3 className="font-bold text-navy-950 font-display">Immutable Audit Trail</h3>
+              <h3 className="font-bold text-navy-950 font-display">Tamper-Evident Audit Trail</h3>
               <p className="text-xs text-slate-500 leading-relaxed">
-                Every consent event and verification request is cryptographically recorded in accordance with INSA national standards.
+                Every consent event and verification request is cryptographically recorded in the audit log.
               </p>
             </div>
           </div>

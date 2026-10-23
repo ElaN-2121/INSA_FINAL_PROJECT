@@ -153,28 +153,29 @@ export default function Dashboard() {
       {/* Metrics Row */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          title="Total Credentials Issued"
+          label="Total Issued"
           value={stats.total}
           icon={Award}
-          trend={{ value: 'Sealed with RSA-2048 key', positive: true }}
+          helpText="Sealed with RSA-2048 key"
         />
         <StatCard
-          title="Active in Registry"
+          label="Active"
           value={stats.active}
           icon={CheckCircle2}
-          trend={{ value: 'Verifiable nationally', positive: true }}
+          helpText="Accredited in Trust Registry"
         />
         <StatCard
-          title="Revoked Credentials"
+          label="Revoked"
           value={stats.revoked}
           icon={AlertTriangle}
-          trend={{ value: 'Permanently invalidated', positive: false }}
+          helpText="Invalidated in Registry"
+          trend={{ value: 'Invalidated in Registry', positive: false }}
         />
         <StatCard
-          title="Issued This Month"
+          label="Issued This Month"
           value={stats.batchesThisMonth}
           icon={Calendar}
-          trend={{ value: 'Current academic cycle', positive: true }}
+          helpText="Current academic cycle"
         />
       </div>
 
@@ -230,7 +231,7 @@ export default function Dashboard() {
             Institution Key & Registry
           </h3>
           <p className="mt-1 text-xs text-slate-600 leading-relaxed">
-            Verify active RSA public keys registered with the Federal Ministry of Education Trust Registry.
+            Verify active RSA public keys registered with the EthioCred Trust Registry.
           </p>
         </div>
       </div>
@@ -243,7 +244,7 @@ export default function Dashboard() {
               Recent Issued Credentials
             </h3>
             <p className="text-sm text-slate-500">
-              Live records committed to the immutable National Credential Registry
+              Live records committed to the tamper-evident National Credential Registry
             </p>
           </div>
           <Link

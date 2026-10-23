@@ -81,7 +81,7 @@ export default function Login() {
       <div className="pt-4 border-t border-slate-100 text-center">
         <p className="text-xs text-slate-500">
           Need registrar credentials? Contact the{' '}
-          <span className="font-semibold text-slate-700">INSA Trust Registry Administrator</span>.
+          <span className="font-semibold text-slate-700">EthioCred Trust Administrator</span>.
         </p>
       </div>
     </div>

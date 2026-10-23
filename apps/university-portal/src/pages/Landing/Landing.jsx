@@ -33,7 +33,7 @@ export default function Landing() {
                   University Portal
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 hidden sm:block">Ministry of Education Academic Trust Grid</p>
+              <p className="text-[11px] text-slate-500 hidden sm:block">EthioCred Academic Trust Registry</p>
             </div>
           </div>
 
@@ -75,7 +75,7 @@ export default function Landing() {
               </h1>
 
               <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed">
-                The institutional issuing authority for Ethiopian universities. Upload graduating batches via CSV, stage and review records, and digitally sign credentials with RSA-2048 keys anchored in the INSA Trust Registry.
+                The institutional issuing authority for Ethiopian universities. Upload graduating batches via CSV, stage and review records, and digitally sign credentials with RSA-2048 keys anchored in the EthioCred Trust Registry.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-2 justify-center lg:justify-start">

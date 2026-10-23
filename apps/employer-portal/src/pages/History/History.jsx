@@ -94,7 +94,7 @@ export default function History() {
     <div className="space-y-6">
       <PageHeader
         title="Verification Audit Trail"
-        description="Immutable cryptographic verification logs executed in this browser environment."
+        description="Tamper-evident cryptographic verification logs executed in this browser environment."
         actions={
           <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
             Total Verifications: {results.length}

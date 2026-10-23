@@ -191,7 +191,7 @@ export default function Landing() {
                   </div>
 
                   <div className="border-t border-slate-100 pt-3 flex items-center justify-between text-[10px] text-slate-400">
-                    <span>Audit sealed on INSA Registry</span>
+                    <span>Audit sealed on EthioCred Registry</span>
                     <span className="font-semibold text-navy-900 flex items-center gap-1">
                       <Printer size={12} /> Printable Dossier
                     </span>
