@@ -300,11 +300,11 @@ const RevocationDemo = () => {
 const SecurityDemo = () => (
   <div className="mx-auto max-w-4xl space-y-6">
     <div className="mb-6">
-      <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900">
         <Shield size={24} className="text-red-600" />
         Security Validation Suite
       </h1>
-      <p className="mt-1 text-sm text-gray-500">
+      <p className="mt-1 text-sm text-slate-500">
         These demonstrations prove that EthioCred correctly detects and rejects three common attack
         scenarios. All demos are safe — no permanent changes are made to your data.
       </p>
