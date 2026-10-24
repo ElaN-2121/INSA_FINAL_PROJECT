@@ -5,6 +5,8 @@ import {
   BarChart3,
   Upload,
   FileCheck2,
+  TrendingUp,
+  Trophy,
   Settings,
   LogOut,
   Menu,
@@ -18,6 +20,8 @@ const navLinks = [
   { to: '/insights', label: 'Department Insights', Icon: BarChart3 },
   { to: '/upload', label: 'Upload Batch', Icon: Upload },
   { to: '/credentials', label: 'Issued Credentials', Icon: FileCheck2 },
+  { to: '/analytics', label: 'Analytics', Icon: TrendingUp },
+  { to: '/leaderboard', label: 'Rankings', Icon: Trophy },
   { to: '/settings', label: 'Settings', Icon: Settings },
 ];
 

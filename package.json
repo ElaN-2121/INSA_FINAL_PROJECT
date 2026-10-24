@@ -16,6 +16,7 @@
     "dev:admin": "cd apps/admin-portal && npm run dev",
     "seed": "node scripts/seed-database.js",
     "seed:analytics-demo": "node scripts/seed-analytics-demo.js",
+    "migrate": "node scripts/run-migrations.js",
     "generate-keys": "node scripts/generate-rsa-keys.js"
   },
   "dependencies": {

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const { getClient } = require('../config/database');
+const { query } = require('../config/database');
 const credentialRepository = require('../repositories/credentialRepository');
 const csvBatchRepository = require('../repositories/csvBatchRepository');
 const notificationRepository = require('../repositories/notificationRepository');
@@ -202,9 +203,56 @@ async function getCredentialWithDetails(credentialId) {
   return credentialRepository.findWithDetails(credentialId);
 }
 
+async function findInstitutionRegistrar(institutionId) {
+  const result = await query(
+    `SELECT id FROM users WHERE institution_id = $1 AND role = 'UNIVERSITY' LIMIT 1`,
+    [institutionId]
+  );
+  return result.rows[0]?.id || null;
+}
+
+async function issueFromApi(institutionId, studentsArray) {
+  const { valid, invalid } = validateCsvRows(studentsArray);
+
+  if (invalid.length > 0) {
+    return { success: false, invalid };
+  }
+
+  const institution = await institutionRepository.findById(institutionId);
+  if (!institution) {
+    throw new Error('Institution not found');
+  }
+
+  if (institution.status !== 'ACTIVE') {
+    throw new Error('Institution is not active');
+  }
+
+  const registrarId = await findInstitutionRegistrar(institutionId);
+  if (!registrarId) {
+    throw new Error('No registrar found for institution');
+  }
+
+  const batch = await csvBatchRepository.createBatch({
+    institutionId,
+    uploadedBy: registrarId,
+    filename: `api-issue-${Date.now()}.json`,
+    fileData: valid,
+    totalRecords: valid.length,
+  });
+
+  const result = await issueBatch(batch.id, registrarId);
+
+  return {
+    success: true,
+    issued: result.issued,
+    credentials: result.credentials,
+  };
+}
+
 module.exports = {
   stageBatch,
   issueBatch,
+  issueFromApi,
   getCredentialsByHolder,
   getCredentialsByInstitution,
   revokeCredential,

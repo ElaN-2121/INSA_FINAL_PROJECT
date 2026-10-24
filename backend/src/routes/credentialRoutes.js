@@ -1,6 +1,7 @@
 const express = require('express');
 const credentialController = require('../controllers/credentialController');
 const authenticate = require('../middleware/authenticate');
+const authenticateApiKey = require('../middleware/authenticateApiKey');
 const authorize = require('../middleware/authorize');
 
 const router = express.Router();
@@ -20,6 +21,15 @@ router.post(
   credentialController.issueBatch
 );
 
+router.post('/api/issue', authenticateApiKey, credentialController.issueFromApi);
+
+router.get(
+  '/mine/verification-history',
+  authenticate,
+  authorize('STUDENT'),
+  credentialController.getMyVerificationHistory
+);
+
 router.get(
   '/mine',
   authenticate,
@@ -33,6 +43,8 @@ router.get(
   authorize('UNIVERSITY'),
   credentialController.getInstitutionCredentials
 );
+
+router.get('/:id/pdf', authenticate, credentialController.downloadCredentialPdf);
 
 router.get('/:id', authenticate, credentialController.getCredentialById);
 

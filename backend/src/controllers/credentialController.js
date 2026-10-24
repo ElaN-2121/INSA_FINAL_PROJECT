@@ -1,5 +1,8 @@
 const multer = require('multer');
 const credentialService = require('../services/credentialService');
+const credentialRepository = require('../repositories/credentialRepository');
+const verificationRepository = require('../repositories/verificationRepository');
+const pdfService = require('../services/pdfService');
 const { success, error } = require('../utils/apiResponse');
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -95,12 +98,93 @@ async function revokeCredential(req, res) {
   }
 }
 
+async function issueFromApi(req, res) {
+  const { students } = req.body;
+
+  if (!Array.isArray(students) || students.length === 0) {
+    return error(res, 'students array is required and must not be empty', 400);
+  }
+
+  if (req.institution.status !== 'ACTIVE') {
+    return error(res, 'Institution is not active', 403);
+  }
+
+  try {
+    const result = await credentialService.issueFromApi(req.institution.id, students);
+
+    if (!result.success) {
+      return error(res, 'Validation failed for one or more student records', 400, result.invalid);
+    }
+
+    return success(res, result, 'Credentials issued successfully', 201);
+  } catch (err) {
+    if (err.message === 'Institution not found') {
+      return error(res, 'Institution not found', 404);
+    }
+    if (err.message === 'Institution is not active') {
+      return error(res, 'Institution is not active', 403);
+    }
+    if (err.message === 'No registrar found for institution') {
+      return error(res, 'No registrar found for institution', 400);
+    }
+    throw err;
+  }
+}
+
+async function getMyVerificationHistory(req, res) {
+  const credentials = await credentialRepository.findByHolderId(req.user.id);
+  const credentialIds = credentials.map((c) => c.id);
+
+  const logs = await verificationRepository.findByCredentialIds(credentialIds);
+
+  const history = credentials.map((credential) => ({
+    credential: {
+      id: credential.id,
+      serial_number: credential.serial_number,
+      degree_name: credential.degree_name,
+      institution_name: credential.institution_name,
+    },
+    verifications: logs.filter((log) => log.credential_id === credential.id),
+  }));
+
+  return success(res, history, 'Verification history retrieved successfully');
+}
+
+async function downloadCredentialPdf(req, res) {
+  const credential = await credentialService.getCredentialWithDetails(req.params.id);
+
+  if (!credential) {
+    return error(res, 'Credential not found', 404);
+  }
+
+  const isHolder = req.user.role === 'STUDENT' && credential.holder_id === req.user.id;
+  const isInstitution =
+    req.user.role === 'UNIVERSITY' && credential.institution_id === req.user.institution_id;
+  const isAdmin = req.user.role === 'ADMIN';
+
+  if (!isHolder && !isInstitution && !isAdmin) {
+    return error(res, 'Forbidden - insufficient permissions', 403);
+  }
+
+  const pdfBuffer = await pdfService.generateCredentialPdf(credential);
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="credential-${credential.serial_number}.pdf"`
+  );
+  return res.end(pdfBuffer);
+}
+
 module.exports = {
   upload,
   uploadBatch,
   issueBatch,
+  issueFromApi,
   getMyCredentials,
   getInstitutionCredentials,
   getCredentialById,
   revokeCredential,
+  getMyVerificationHistory,
+  downloadCredentialPdf,
 };

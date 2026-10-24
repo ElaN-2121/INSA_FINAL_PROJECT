@@ -61,6 +61,33 @@ async function getMe(req, res) {
   return success(res, userWithoutPassword, 'Success');
 }
 
+async function updateProfile(req, res) {
+  const { full_name, email } = req.body;
+  const fields = {};
+
+  if (full_name !== undefined) fields.full_name = full_name;
+  if (email !== undefined) fields.email = email;
+
+  if (Object.keys(fields).length === 0) {
+    return error(res, 'No valid fields to update', 400);
+  }
+
+  if (email) {
+    const existing = await userRepository.findByEmail(email);
+    if (existing && existing.id !== req.user.id) {
+      return error(res, 'This email is already registered', 409);
+    }
+  }
+
+  const updated = await userRepository.updateUser(req.user.id, fields);
+  if (!updated) {
+    return error(res, 'Failed to update profile', 400);
+  }
+
+  const { password_hash, ...userWithoutPassword } = updated;
+  return success(res, userWithoutPassword, 'Profile updated successfully');
+}
+
 async function registerStudent(req, res) {
   const { full_name, fayda_id, email } = req.body;
 
@@ -124,6 +151,7 @@ module.exports = {
   loginWithFayda,
   logout,
   getMe,
+  updateProfile,
   registerStudent,
   registerEmployer,
 };

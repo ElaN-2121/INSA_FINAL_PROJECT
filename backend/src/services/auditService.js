@@ -12,6 +12,8 @@ const INSTITUTION_REGISTERED = 'INSTITUTION_REGISTERED';
 const INSTITUTION_APPROVED = 'INSTITUTION_APPROVED';
 const REGISTRAR_CREATED = 'REGISTRAR_CREATED';
 const ADMIN_CREATED = 'ADMIN_CREATED';
+const API_KEY_GENERATED = 'API_KEY_GENERATED';
+const API_KEY_REVOKED = 'API_KEY_REVOKED';
 
 async function log({ userId, action, entityType, entityId, ipAddress, details }, client = null) {
   const db = client || { query };
@@ -102,6 +104,8 @@ module.exports = {
   INSTITUTION_APPROVED,
   REGISTRAR_CREATED,
   ADMIN_CREATED,
+  API_KEY_GENERATED,
+  API_KEY_REVOKED,
   log,
   getRecentLogs,
   getFilteredLogs,
