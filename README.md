@@ -1,5 +1,10 @@
 # EthioCred – Secure Digital Academic Credential Platform
 
+## Group Members
+1. Abebaye Agumassie - Backend Developer
+2. Dawit Asres - Frontend Developer
+3. Elnathan Nigussie - Backend Developer and Project Manager
+
 ## Quick Start
 
 ### 1. Install dependencies

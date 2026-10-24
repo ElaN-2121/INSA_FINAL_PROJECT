@@ -1,44 +1,96 @@
 const analyticsService = require('../services/analyticsService');
-const { success } = require('../utils/apiResponse');
+const { success, error } = require('../utils/apiResponse');
 
-async function getSystemOverview(req, res) {
-  const overview = await analyticsService.getSystemOverview();
-  return success(res, overview, 'System overview retrieved successfully');
+function isValidDate(dateStr) {
+  if (!dateStr) return true;
+  const timestamp = Date.parse(dateStr);
+  return !isNaN(timestamp);
 }
 
-async function getLeaderboard(req, res) {
-  const leaderboard = await analyticsService.getInstitutionLeaderboard();
-  return success(res, leaderboard, 'Institution leaderboard retrieved successfully');
+/**
+ * GET /api/analytics/university/departments
+ */
+async function getUniversityDepartments(req, res, next) {
+  try {
+    const institutionId = req.user.institution_id;
+    if (!institutionId) {
+      return error(res, 'No institution linked to this registrar account', 400);
+    }
+
+    const { from, to, sort } = req.query;
+
+    if (from && !isValidDate(from)) {
+      return error(res, 'Invalid "from" date parameter. Expected ISO format (YYYY-MM-DD)', 400);
+    }
+    if (to && !isValidDate(to)) {
+      return error(res, 'Invalid "to" date parameter. Expected ISO format (YYYY-MM-DD)', 400);
+    }
+    if (from && to && new Date(from) > new Date(to)) {
+      return error(res, '"from" date cannot be after "to" date', 400);
+    }
+
+    const data = await analyticsService.getUniversityDepartments(institutionId, { from, to, sort });
+    return success(res, data, 'Department analytics retrieved successfully');
+  } catch (err) {
+    return next(err);
+  }
 }
 
-async function getDepartmentStats(req, res) {
-  const { institutionId } = req.query;
-  const stats = await analyticsService.getDepartmentBreakdown(institutionId || null);
-  return success(res, stats, 'Department statistics retrieved successfully');
+/**
+ * GET /api/analytics/university/trend
+ */
+async function getUniversityTrend(req, res, next) {
+  try {
+    const institutionId = req.user.institution_id;
+    if (!institutionId) {
+      return error(res, 'No institution linked to this registrar account', 400);
+    }
+
+    const { department } = req.query;
+    const data = await analyticsService.getUniversityTrend(institutionId, { department });
+    return success(res, data, 'University verification trend retrieved successfully');
+  } catch (err) {
+    return next(err);
+  }
 }
 
-async function getVerificationTrends(req, res) {
-  const months = parseInt(req.query.months, 10) || 6;
-  const trends = await analyticsService.getVerificationTrends(months);
-  return success(res, trends, 'Verification trends retrieved successfully');
+/**
+ * GET /api/analytics/employer/candidates
+ */
+async function getEmployerCandidates(req, res, next) {
+  try {
+    const employerId = req.user.id;
+    if (!employerId) {
+      return error(res, 'Unauthorized employer account', 401);
+    }
+
+    const data = await analyticsService.getEmployerCandidates(employerId);
+    return success(res, data, 'Candidate pipeline analytics retrieved successfully');
+  } catch (err) {
+    return next(err);
+  }
 }
 
-async function getInstitutionStats(req, res) {
-  const { institutionId } = req.params;
-  const stats = await analyticsService.getInstitutionStats(institutionId);
-  return success(res, stats, 'Institution statistics retrieved successfully');
-}
+/**
+ * GET /api/analytics/student/activity
+ */
+async function getStudentActivity(req, res, next) {
+  try {
+    const studentId = req.user.id;
+    if (!studentId) {
+      return error(res, 'Unauthorized student account', 401);
+    }
 
-async function getEmployerActivity(req, res) {
-  const activity = await analyticsService.getEmployerActivityStats();
-  return success(res, activity, 'Employer activity retrieved successfully');
+    const data = await analyticsService.getStudentActivity(studentId);
+    return success(res, data, 'Student activity analytics retrieved successfully');
+  } catch (err) {
+    return next(err);
+  }
 }
 
 module.exports = {
-  getSystemOverview,
-  getLeaderboard,
-  getDepartmentStats,
-  getVerificationTrends,
-  getInstitutionStats,
-  getEmployerActivity,
+  getUniversityDepartments,
+  getUniversityTrend,
+  getEmployerCandidates,
+  getStudentActivity,
 };

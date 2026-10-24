@@ -1,15 +1,27 @@
 {
   "name": "ethiocred",
   "private": true,
-  "workspaces": ["apps/*", "backend", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "backend",
+    "packages/*"
+  ],
   "scripts": {
+    "build": "npm run --workspace=user-wallet build && npm run --workspace=university-portal build && npm run --workspace=employer-portal build && npm run --workspace=admin-portal build",
+    "build:all": "npm run build",
     "dev:backend": "cd backend && npm run dev",
     "dev:wallet": "cd apps/user-wallet && npm run dev",
     "dev:university": "cd apps/university-portal && npm run dev",
     "dev:employer": "cd apps/employer-portal && npm run dev",
     "dev:admin": "cd apps/admin-portal && npm run dev",
     "seed": "node scripts/seed-database.js",
+    "seed:analytics-demo": "node scripts/seed-analytics-demo.js",
     "migrate": "node scripts/run-migrations.js",
     "generate-keys": "node scripts/generate-rsa-keys.js"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@fontsource/noto-sans-ethiopic": "^5.3.0"
   }
 }

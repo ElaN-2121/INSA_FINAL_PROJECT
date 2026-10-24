@@ -1,5 +1,5 @@
-import { Navigate, Outlet } from 'react-router-dom';
-import Loader from '../components/Loader/Loader.jsx';
+import { Loader } from '@ethiocred/ui';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 function roleMatches(userRole, requiredRole) {
@@ -8,7 +8,7 @@ function roleMatches(userRole, requiredRole) {
   return userRole === requiredRole;
 }
 
-export default function ProtectedRoute({ role }) {
+export default function ProtectedRoute({ children, role }) {
   const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
@@ -27,5 +27,5 @@ export default function ProtectedRoute({ role }) {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  return <Outlet />;
+  return children;
 }

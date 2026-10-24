@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Copy, Check, Building2, KeyRound, User, ShieldCheck, AlertCircle } from 'lucide-react';
 import { get, formatDateTime } from '@ethiocred/utils';
+import { Badge, Loader, Button, PageHeader } from '@ethiocred/ui';
 import { useAuth } from '../../context/AuthContext.jsx';
-import Badge from '../../components/Badge/Badge.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
 
 function statusBadge(status) {
   if (status === 'ACTIVE') return <Badge variant="green">ACTIVE</Badge>;
@@ -23,7 +22,7 @@ export default function Settings() {
   useEffect(() => {
     if (!user?.institution_id) {
       setLoading(false);
-      setError('No institution linked to your account.');
+      setError('No institution linked to your registrar account.');
       return;
     }
 
@@ -57,93 +56,117 @@ export default function Settings() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-200">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900">Settings</h2>
-            <p className="mt-1 text-sm text-slate-500">Manage your institution profile and registry credentials.</p>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-6 max-w-5xl mx-auto">
+      <PageHeader
+        title="Institution Settings & Cryptography"
+        description="Accreditation status, registrar profile, and public keys registered with the Federal Trust Registry."
+      />
 
       {error && (
-        <div className="rounded-3xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 shadow-sm">
-          {error}
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 flex items-center gap-3">
+          <AlertCircle className="h-5 w-5 text-rose-600 shrink-0" />
+          <p>{error}</p>
         </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Institution</h3>
+        {/* Institution Details */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+            <Building2 className="h-5 w-5 text-navy-800" />
+            <h3 className="font-display font-semibold text-slate-900 text-base">
+              Accredited Institution Profile
+            </h3>
+          </div>
+
           {institution ? (
-            <dl className="space-y-4">
+            <dl className="space-y-3.5 text-sm">
               <div>
-                <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Name</dt>
-                <dd className="mt-1 text-base font-medium text-slate-900">{institution.name}</dd>
+                <dt className="text-xs uppercase font-bold tracking-wider text-slate-500">Institution Name</dt>
+                <dd className="mt-0.5 text-base font-semibold text-slate-900">{institution.name}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Registration Number</dt>
-                <dd className="mt-1 text-base font-medium text-slate-900">{institution.registration_number || '-'}</dd>
+                <dt className="text-xs uppercase font-bold tracking-wider text-slate-500">MoE Registration Number</dt>
+                <dd className="mt-0.5 font-mono text-slate-800">{institution.registration_number || '—'}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Status</dt>
-                <dd className="mt-2">{statusBadge(institution.status)}</dd>
+                <dt className="text-xs uppercase font-bold tracking-wider text-slate-500">Trust Registry Status</dt>
+                <dd className="mt-1">{statusBadge(institution.status)}</dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Approved At</dt>
-                <dd className="mt-1 text-base font-medium text-slate-900">
-                  {institution.approved_at ? formatDateTime(institution.approved_at) : '-'}
+                <dt className="text-xs uppercase font-bold tracking-wider text-slate-500">Accredited Since</dt>
+                <dd className="mt-0.5 text-slate-700">
+                  {institution.approved_at ? formatDateTime(institution.approved_at) : 'Under Review'}
                 </dd>
               </div>
             </dl>
           ) : (
-            <p className="text-slate-500">Institution data unavailable.</p>
+            <p className="text-sm text-slate-500">Institution metadata not found.</p>
           )}
         </div>
 
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4">Registrar Profile</h3>
-          <dl className="space-y-4">
+        {/* Registrar Profile */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+            <User className="h-5 w-5 text-navy-800" />
+            <h3 className="font-display font-semibold text-slate-900 text-base">
+              Authorized Registrar Officer
+            </h3>
+          </div>
+
+          <dl className="space-y-3.5 text-sm">
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Full Name</dt>
-              <dd className="mt-1 text-base font-medium text-slate-900">{user?.full_name || '-'}</dd>
+              <dt className="text-xs uppercase font-bold tracking-wider text-slate-500">Officer Name</dt>
+              <dd className="mt-0.5 text-base font-semibold text-slate-900">{user?.full_name || '—'}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Email</dt>
-              <dd className="mt-1 text-base font-medium text-slate-900">{user?.email || '-'}</dd>
+              <dt className="text-xs uppercase font-bold tracking-wider text-slate-500">Official Email</dt>
+              <dd className="mt-0.5 text-slate-800">{user?.email || '—'}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-500">Role</dt>
-              <dd className="mt-2"><Badge variant="blue">{user?.role}</Badge></dd>
+              <dt className="text-xs uppercase font-bold tracking-wider text-slate-500">System Permission</dt>
+              <dd className="mt-1">
+                <Badge variant="blue">UNIVERSITY REGISTRAR</Badge>
+              </dd>
             </div>
           </dl>
         </div>
       </div>
 
-      <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      {/* Trust Registry RSA Public Key */}
+      <div className="rounded-2xl border border-slate-800 bg-navy-950 p-6 text-white shadow-md space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-navy-800 pb-4">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900">Public Key (Trust Registry)</h3>
-            <p className="mt-1 text-sm text-slate-500">Use this public key to verify your institution's issued credentials.</p>
+            <div className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-amber-400" />
+              <h3 className="font-display font-semibold text-white text-base">
+                Institution Public Key (RSA-2048)
+              </h3>
+            </div>
+            <p className="mt-1 text-xs text-slate-400">
+              Published in the National Trust Registry. Used by employers and verifiers to mathematically confirm digital signatures.
+            </p>
           </div>
+
           {publicKey && (
-            <button
-              type="button"
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleCopy}
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition-all duration-200 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border-slate-700 text-slate-200 hover:bg-white/10 shrink-0"
             >
-              {copied ? <Check size={16} /> : <Copy size={16} />}
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
+              {copied ? <Check className="mr-1.5 h-4 w-4 text-emerald-400" /> : <Copy className="mr-1.5 h-4 w-4" />}
+              {copied ? 'Copied Key' : 'Copy Public Key'}
+            </Button>
           )}
         </div>
+
         {publicKey ? (
-          <pre className="mt-5 max-h-64 overflow-x-auto rounded-3xl bg-slate-950 px-4 py-4 text-xs text-green-300 font-mono shadow-inner">
+          <pre className="p-4 rounded-xl bg-navy-900 font-mono text-xs text-emerald-300 break-all border border-navy-800 overflow-x-auto max-h-64">
             {publicKey}
           </pre>
         ) : (
-          <p className="mt-4 text-sm text-slate-500">Public key not found in trust registry.</p>
+          <p className="text-sm text-slate-400">No public key registered for this institution.</p>
         )}
       </div>
     </div>

@@ -1,16 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
 import { get, post, formatDate, formatDateTime } from '@ethiocred/utils';
-import Badge from '../../components/Badge/Badge.jsx';
-import Loader from '../../components/Loader/Loader.jsx';
+import { Button, Badge, Card, Loader, EmptyState, Alert } from '@ethiocred/ui';
+import {
+  ShieldCheck,
+  Building2,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  FileText,
+  AlertCircle,
+  Calendar,
+} from 'lucide-react';
 
 function requestStatusBadge(status) {
   const map = {
-    PENDING: 'yellow',
-    APPROVED: 'blue',
-    DENIED: 'red',
-    COMPLETED: 'green',
+    PENDING: 'warning',
+    APPROVED: 'success',
+    DENIED: 'danger',
+    COMPLETED: 'info',
   };
-  return <Badge variant={map[status] || 'gray'}>{status}</Badge>;
+  return <Badge variant={map[status] || 'gray'} dot={status === 'PENDING'} pulse={status === 'PENDING'}>{status}</Badge>;
 }
 
 export default function VerificationRequests() {
@@ -19,6 +28,7 @@ export default function VerificationRequests() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('pending');
   const [actionId, setActionId] = useState(null);
+  const [actionType, setActionType] = useState(null);
 
   const fetchRequests = () => {
     setLoading(true);
@@ -37,6 +47,7 @@ export default function VerificationRequests() {
 
   const handleApprove = async (requestId) => {
     setActionId(requestId);
+    setActionType('approve');
     try {
       await post(`/verification/requests/${requestId}/approve`);
       fetchRequests();
@@ -44,11 +55,13 @@ export default function VerificationRequests() {
       setError(err.response?.data?.message || 'Failed to approve request');
     } finally {
       setActionId(null);
+      setActionType(null);
     }
   };
 
   const handleDeny = async (requestId) => {
     setActionId(requestId);
+    setActionType('deny');
     try {
       await post(`/verification/requests/${requestId}/deny`);
       fetchRequests();
@@ -56,106 +69,195 @@ export default function VerificationRequests() {
       setError(err.response?.data?.message || 'Failed to deny request');
     } finally {
       setActionId(null);
+      setActionType(null);
     }
   };
 
-  if (loading) {
+  if (loading && requests.length === 0) {
     return (
-      <div className="flex justify-center py-20">
-        <Loader />
+      <div className="flex flex-col items-center justify-center py-24 space-y-4">
+        <Loader size="lg" color="text-emerald-600" />
+        <p className="text-sm font-semibold text-slate-500">Loading verification requests...</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <h2 className="mb-6 text-2xl font-semibold text-gray-900">Verification Requests</h2>
-
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          {error}
+    <div className="space-y-6 max-w-4xl mx-auto">
+      {/* Page Header */}
+      <div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            Consent Manager
+          </span>
         </div>
-      )}
-
-      <div className="mb-6 flex border-b border-gray-200">
-        {['pending', 'history'].map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setActiveTab(tab)}
-            className={`border-b-2 px-4 py-2.5 text-sm font-medium capitalize transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              activeTab === tab
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            {tab} {tab === 'pending' && pending.length > 0 && `(${pending.length})`}
-          </button>
-        ))}
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-navy-950 font-display mt-1">
+          Verification Requests
+        </h1>
+        <p className="text-sm text-slate-500 mt-1">
+          Review and approve employer verification requests before anyone can view your academic credentials.
+        </p>
       </div>
 
+      {error && (
+        <Alert variant="danger" onClose={() => setError('')}>
+          {error}
+        </Alert>
+      )}
+
+      {/* Tabs */}
+      <div className="flex rounded-xl bg-slate-100 p-1 border border-slate-200/80 max-w-xs">
+        <button
+          type="button"
+          onClick={() => setActiveTab('pending')}
+          className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all duration-150 focus-ring ${
+            activeTab === 'pending'
+              ? 'bg-white text-navy-950 shadow-soft'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <span>Pending</span>
+          {pending.length > 0 && (
+            <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+              {pending.length}
+            </span>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('history')}
+          className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all duration-150 focus-ring ${
+            activeTab === 'history'
+              ? 'bg-white text-navy-950 shadow-soft'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <span>History</span>
+          <span className="text-slate-400 text-[11px]">({history.length})</span>
+        </button>
+      </div>
+
+      {/* Pending Requests Tab */}
       {activeTab === 'pending' && (
         <div className="space-y-4">
           {pending.length === 0 ? (
-            <p className="text-sm text-gray-500">No pending verification requests.</p>
+            <EmptyState
+              icon={ShieldCheck}
+              title="No Pending Requests"
+              description="You have no outstanding employer access requests. When an employer requests to verify your degree, it will appear here for your consent."
+            />
           ) : (
-            pending.map((req) => (
-              <div
-                key={req.id}
-                className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
-              >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="space-y-1">
-                    <p className="text-base font-semibold text-gray-900">{req.employer_name}</p>
-                    <p className="text-sm text-gray-600">
-                      {req.degree_name} — {req.serial_number}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      Requested: {formatDateTime(req.requested_at)}
-                      {req.expires_at && ` · Expires: ${formatDate(req.expires_at)}`}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleApprove(req.id)}
-                      disabled={actionId === req.id}
-                      className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeny(req.id)}
-                      disabled={actionId === req.id}
-                      className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      Deny
-                    </button>
+            pending.map((req) => {
+              const isActing = actionId === req.id;
+
+              return (
+                <div
+                  key={req.id}
+                  className="rounded-2xl border-2 border-amber-300/80 bg-white p-6 shadow-soft ring-4 ring-amber-50/60 transition-all hover:shadow-card"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
+                    <div className="flex items-start gap-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-amber-800 border border-amber-200 shadow-soft">
+                        <Building2 size={24} />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-bold text-navy-950 font-display">
+                            {req.employer_name}
+                          </h3>
+                          <Badge variant="yellow" dot pulse size="sm">
+                            Awaiting Consent
+                          </Badge>
+                        </div>
+                        <p className="text-sm font-semibold text-slate-700">
+                          Requesting access to: {req.degree_name}
+                        </p>
+                        <p className="text-xs font-mono text-slate-400">
+                          Serial: {req.serial_number}
+                        </p>
+                        <div className="flex items-center gap-4 text-xs text-slate-500 pt-1">
+                          <span className="flex items-center gap-1">
+                            <Clock size={13} className="text-slate-400" />
+                            <span>Requested: {formatDateTime(req.requested_at)}</span>
+                          </span>
+                          {req.expires_at && (
+                            <span className="flex items-center gap-1 font-semibold text-amber-700">
+                              <AlertCircle size={13} />
+                              <span>Expires: {formatDate(req.expires_at)}</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-2 sm:pt-0 shrink-0">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={isActing}
+                        isLoading={isActing && actionType === 'deny'}
+                        onClick={() => handleDeny(req.id)}
+                        className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300"
+                      >
+                        Deny Access
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="primary"
+                        size="sm"
+                        disabled={isActing}
+                        isLoading={isActing && actionType === 'approve'}
+                        leftIcon={CheckCircle2}
+                        onClick={() => handleApprove(req.id)}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-700/20"
+                      >
+                        Approve Access
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       )}
 
+      {/* History Tab */}
       {activeTab === 'history' && (
         <div className="space-y-3">
           {history.length === 0 ? (
-            <p className="text-sm text-gray-500">No request history yet.</p>
+            <EmptyState
+              icon={FileText}
+              title="No Consent History"
+              description="No past verification decisions found."
+            />
           ) : (
             history.map((req) => (
               <div
                 key={req.id}
-                className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+                className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-soft transition-all hover:border-slate-300 flex items-center justify-between gap-4"
               >
-                <div className="space-y-1">
-                  <p className="font-medium text-gray-900">{req.employer_name}</p>
-                  <p className="text-sm text-gray-600">{req.degree_name}</p>
-                  <p className="text-xs text-gray-400">{formatDateTime(req.requested_at)}</p>
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-700 border border-slate-200">
+                    <Building2 size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold text-slate-900 font-display truncate">
+                      {req.employer_name}
+                    </p>
+                    <p className="text-xs text-slate-600 truncate">
+                      {req.degree_name} · Serial: {req.serial_number}
+                    </p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Decision logged: {formatDateTime(req.requested_at)}
+                    </p>
+                  </div>
                 </div>
-                {requestStatusBadge(req.status)}
+
+                <div className="shrink-0">
+                  {requestStatusBadge(req.status)}
+                </div>
               </div>
             ))
           )}

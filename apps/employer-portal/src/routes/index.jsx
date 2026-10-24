@@ -1,8 +1,8 @@
+import { Loader } from '@ethiocred/ui';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import AuthLayout from '../layouts/AuthLayout.jsx';
 import DashboardLayout from '../layouts/DashboardLayout.jsx';
-import Loader from '../components/Loader/Loader.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import Landing from '../pages/Landing/Landing.jsx';
 import Login from '../pages/Login/Login.jsx';
@@ -13,6 +13,7 @@ import VerifyCredential from '../pages/VerifyCredential/VerifyCredential.jsx';
 import RequestVerification from '../pages/RequestVerification/RequestVerification.jsx';
 import History from '../pages/History/History.jsx';
 import RequestStatus from '../pages/RequestStatus/RequestStatus.jsx';
+import TalentPipeline from '../pages/Pipeline/TalentPipeline.jsx';
 
 function LandingRoute() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -66,6 +67,7 @@ export default function AppRoutes() {
         }
       >
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/pipeline" element={<TalentPipeline />} />
         <Route path="/verify" element={<VerifyCredential />} />
         <Route path="/request" element={<RequestVerification />} />
         <Route path="/history" element={<History />} />

@@ -1,15 +1,44 @@
 const express = require('express');
-const analyticsController = require('../controllers/analyticsController');
+const router = express.Router();
 const authenticate = require('../middleware/authenticate');
 const authorize = require('../middleware/authorize');
+const analyticsController = require('../controllers/analyticsController');
 
-const router = express.Router();
+/**
+ * University Analytics (Role: UNIVERSITY)
+ */
+router.get(
+  '/university/departments',
+  authenticate,
+  authorize('UNIVERSITY'),
+  analyticsController.getUniversityDepartments
+);
 
-router.get('/overview', authenticate, authorize('ADMIN'), analyticsController.getSystemOverview);
-router.get('/leaderboard', analyticsController.getLeaderboard);
-router.get('/departments', analyticsController.getDepartmentStats);
-router.get('/trends', authenticate, authorize('ADMIN'), analyticsController.getVerificationTrends);
-router.get('/institution/:institutionId', authenticate, analyticsController.getInstitutionStats);
-router.get('/employers', authenticate, authorize('ADMIN'), analyticsController.getEmployerActivity);
+router.get(
+  '/university/trend',
+  authenticate,
+  authorize('UNIVERSITY'),
+  analyticsController.getUniversityTrend
+);
+
+/**
+ * Employer Analytics (Role: EMPLOYER)
+ */
+router.get(
+  '/employer/candidates',
+  authenticate,
+  authorize('EMPLOYER'),
+  analyticsController.getEmployerCandidates
+);
+
+/**
+ * Student Analytics (Role: STUDENT)
+ */
+router.get(
+  '/student/activity',
+  authenticate,
+  authorize('STUDENT'),
+  analyticsController.getStudentActivity
+);
 
 module.exports = router;

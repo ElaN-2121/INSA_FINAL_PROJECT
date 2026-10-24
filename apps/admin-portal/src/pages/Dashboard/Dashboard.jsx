@@ -1,8 +1,21 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { AlertTriangle } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  Building2,
+  CheckCircle2,
+  Clock,
+  Users,
+  Award,
+  ShieldCheck,
+  FileSearch,
+  ShieldAlert,
+  ChevronRight,
+  Plus,
+  Lock,
+  AlertCircle
+} from 'lucide-react';
+import { Loader, StatCard, Button, PageHeader, Badge } from '@ethiocred/ui';
 import { get } from '../../services/api.js';
-import Loader from '../../components/Loader/Loader.jsx';
 
 export default function Dashboard() {
   const [institutions, setInstitutions] = useState([]);
@@ -10,6 +23,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     Promise.all([
@@ -45,70 +59,177 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="text-2xl font-semibold text-gray-900">Admin Dashboard</h2>
-        <p className="mt-1 text-sm text-gray-500">
-          Platform overview — institutions, users, and pending approvals.
-        </p>
-      </div>
+      <PageHeader
+        title="National Trust Registry Administration"
+        description="Root security administration: institutional accreditation, cryptographic key governance, and system-wide audit telemetry."
+        actions={
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => navigate('/audit-logs')}
+              className="border-slate-300 text-slate-700 hover:bg-slate-50"
+            >
+              <FileSearch className="mr-2 h-4 w-4 text-slate-500" />
+              Security Logs
+            </Button>
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => navigate('/institutions')}
+              className="bg-navy-900 hover:bg-navy-800 text-white shadow-sm"
+            >
+              <Building2 className="mr-2 h-4 w-4" />
+              Manage Institutions
+            </Button>
+          </div>
+        }
+      />
 
       {error && (
-        <div className="rounded-3xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 shadow-sm">
-          {error}
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 flex items-center gap-3">
+          <AlertCircle className="h-5 w-5 text-rose-600 shrink-0" />
+          <p>{error}</p>
         </div>
       )}
 
+      {/* Pending Accreditation Urgent Banner */}
       {pending.length > 0 && (
-        <div className="flex flex-col gap-4 rounded-[1.75rem] border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            <AlertTriangle className="mt-0.5 shrink-0 text-amber-600" size={20} />
-            <p className="text-sm font-medium text-amber-900">
-              {pending.length} institution{pending.length !== 1 ? 's' : ''} awaiting approval
-            </p>
+        <div className="rounded-2xl border border-amber-300 bg-gradient-to-r from-amber-50 to-amber-100/60 p-5 shadow-sm transition hover:shadow-md">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="rounded-xl bg-amber-500/20 p-2.5 text-amber-900 shrink-0">
+                <Clock className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-amber-950 text-base">
+                  {pending.length} University Accreditation Request{pending.length !== 1 ? 's' : ''} Awaiting Review
+                </h3>
+                <p className="mt-0.5 text-xs text-amber-800/90 leading-relaxed">
+                  Higher education institutions pending approval cannot issue cryptographically binding credentials until vetted.
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => navigate('/institutions')}
+              className="bg-amber-600 hover:bg-amber-700 text-white shrink-0"
+            >
+              Review Pending
+              <ChevronRight className="ml-1.5 h-4 w-4" />
+            </Button>
           </div>
-          <Link
-            to="/institutions"
-            className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Review Institutions
-          </Link>
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {[
-          { label: 'Total Institutions', value: counts.total },
-          { label: 'Active Institutions', value: counts.active },
-          { label: 'Pending Institutions', value: counts.pending },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-            <p className="mt-2 text-3xl font-bold text-gray-900">{stat.value}</p>
-          </div>
-        ))}
+      {/* Primary Metrics Row */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <StatCard
+          label="Total Institutions"
+          value={counts.total}
+          icon={Building2}
+          helpText="Accredited & pending"
+        />
+        <StatCard
+          label="Active Trust Members"
+          value={counts.active}
+          icon={CheckCircle2}
+          helpText="Authorized to sign credentials"
+        />
+        <StatCard
+          label="Pending Review"
+          value={counts.pending}
+          icon={Clock}
+          helpText={
+            counts.pending > 0
+              ? `${counts.pending} awaiting clearance`
+              : 'Zero backlog'
+          }
+          trend={counts.pending > 0 ? { value: `${counts.pending} pending`, positive: false } : { value: 'Zero backlog', positive: true }}
+        />
       </div>
 
+      {/* Platform Activity Stats Row */}
       {stats && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {[
-            { label: 'Total Users', value: stats.users },
-            { label: 'Credentials', value: stats.credentials },
-            { label: 'Verifications', value: stats.verifications },
-            { label: 'Institutions (DB)', value: stats.institutions },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-              <p className="mt-2 text-3xl font-bold text-gray-900">{stat.value}</p>
-            </div>
-          ))}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <StatCard
+            label="Total Registered Users"
+            value={stats.users}
+            icon={Users}
+            helpText="Students, registrars & employers"
+          />
+          <StatCard
+            label="Total Sealed Credentials"
+            value={stats.credentials}
+            icon={Award}
+            helpText="RSA-signed diplomas stored"
+          />
+          <StatCard
+            label="Verification Inquiries"
+            value={stats.verifications}
+            icon={ShieldCheck}
+            helpText="Cryptographic checks completed"
+          />
         </div>
       )}
+
+      {/* Quick Launchpad Panels */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div
+          onClick={() => navigate('/institutions')}
+          className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-navy-300 cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div className="rounded-xl bg-navy-50 p-3 text-navy-800 group-hover:bg-navy-100 transition-colors">
+              <Building2 className="h-6 w-6" />
+            </div>
+            <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 group-hover:text-navy-900 transition-all" />
+          </div>
+          <h3 className="mt-4 font-display font-bold text-slate-900 text-base">
+            Trust Registry Governance
+          </h3>
+          <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+            Onboard new universities, review registration numbers, manage public key rotations, and suspend rogue issuers.
+          </p>
+        </div>
+
+        <div
+          onClick={() => navigate('/audit-logs')}
+          className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md hover:border-navy-300 cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div className="rounded-xl bg-slate-100 p-3 text-slate-700 group-hover:bg-slate-200 transition-colors">
+              <FileSearch className="h-6 w-6" />
+            </div>
+            <ChevronRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 group-hover:text-navy-900 transition-all" />
+          </div>
+          <h3 className="mt-4 font-display font-bold text-slate-900 text-base">
+            System Security Audit Logs
+          </h3>
+          <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+            Monitor real-time security events, authentication attempts, revocation notices, and IP address telemetry.
+          </p>
+        </div>
+
+        <div
+          onClick={() => navigate('/security-demo')}
+          className="group rounded-2xl border border-navy-800 bg-gradient-to-br from-navy-950 to-slate-900 p-6 text-white shadow-md transition-all hover:shadow-lg cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div className="rounded-xl bg-emerald-500/10 p-3 text-emerald-400 group-hover:bg-emerald-500/20 transition-colors">
+              <ShieldAlert className="h-6 w-6" />
+            </div>
+            <ChevronRight className="h-5 w-5 text-emerald-400 group-hover:translate-x-1 transition-all" />
+          </div>
+          <h3 className="mt-4 font-display font-bold text-white text-base">
+            Interactive Attack Simulator
+          </h3>
+          <p className="mt-1 text-xs text-slate-300 leading-relaxed">
+            Simulate GPA tampering, unauthorized rogue university keys, and revoked credential verification defense.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

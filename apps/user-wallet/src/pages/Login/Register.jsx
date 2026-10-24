@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { Button, Input, Alert } from '@ethiocred/ui';
+import { ArrowLeft, UserPlus } from 'lucide-react';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -44,82 +46,88 @@ export default function Register({ onBack }) {
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <p className="text-sm font-semibold uppercase tracking-wider text-blue-700">User Wallet</p>
-        <h2 className="mt-3 text-2xl font-bold text-gray-900">Create Your Wallet</h2>
-        <p className="mt-2 text-sm text-gray-500">
-          Register to receive and manage your digital credentials.
+      <div className="space-y-1 text-center sm:text-left">
+        <h2 className="text-2xl font-bold tracking-tight text-navy-950 font-display">
+          Create Your Student Wallet
+        </h2>
+        <p className="text-sm text-slate-500">
+          Register to claim and hold your verified university credentials.
         </p>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <Alert variant="danger" onClose={() => setError('')}>
           {error}
-        </div>
+        </Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label htmlFor="fullName" className="mb-1 block text-sm font-medium text-gray-700">
-            Full Name
-          </label>
-          <input
-            id="fullName"
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            placeholder="Your full name"
-          />
-        </div>
-        <div>
-          <label htmlFor="faydaId" className="mb-1 block text-sm font-medium text-gray-700">
-            Fayda ID
-          </label>
-          <input
-            id="faydaId"
-            type="text"
-            value={faydaId}
-            onChange={(e) => setFaydaId(e.target.value)}
-            placeholder="FAYDA-001"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-            Email address
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            placeholder="you@example.com"
-          />
-        </div>
-        <button
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          id="fullName"
+          label="Full Legal Name"
+          type="text"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          required
+          placeholder="e.g. Abebe Bekele Tessema"
+        />
+
+        <Input
+          id="faydaId"
+          label="National Fayda ID"
+          type="text"
+          value={faydaId}
+          onChange={(e) => setFaydaId(e.target.value)}
+          placeholder="FAYDA-001"
+          helperText="Must match the National ID provided to your university registrar."
+          required
+        />
+
+        <Input
+          id="email"
+          label="Email address"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+          placeholder="you@example.com"
+        />
+
+        <Button
           type="submit"
-          disabled={submitting}
-          className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          variant="primary"
+          size="md"
+          className="w-full mt-2"
+          isLoading={submitting}
+          loadingText="Creating wallet..."
+          rightIcon={UserPlus}
         >
-          {submitting ? 'Creating wallet...' : 'Create My Wallet'}
-        </button>
+          Create Wallet
+        </Button>
       </form>
 
-      <p className="text-center text-sm text-gray-600">
-        Already have an account?{' '}
+      <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
         <button
           type="button"
           onClick={onBack}
-          className="font-medium text-blue-600 transition-colors hover:text-blue-700 focus:outline-none focus:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-navy-900 transition-colors focus-ring rounded"
         >
-          Log in
+          <ArrowLeft size={14} />
+          <span>Back to sign in</span>
         </button>
-      </p>
+
+        <p className="text-xs text-slate-500">
+          Already registered?{' '}
+          <button
+            type="button"
+            onClick={onBack}
+            className="font-semibold text-navy-900 hover:underline focus-ring rounded"
+          >
+            Log in
+          </button>
+        </p>
+      </div>
     </div>
   );
 }

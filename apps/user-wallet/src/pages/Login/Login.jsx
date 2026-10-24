@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Register from './Register.jsx';
-import PasswordInput from '../../components/PasswordInput/PasswordInput.jsx';
+import { Button, Input, PasswordInput, Alert } from '@ethiocred/ui';
+import { Mail, Fingerprint, LogIn } from 'lucide-react';
 
 const TOKEN_KEY = 'ethiocred_token';
 const USER_KEY = 'ethiocred_user';
@@ -54,7 +55,7 @@ export default function Login() {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Student not found');
+      setError(err.response?.data?.message || 'Student not found with this Fayda ID');
     } finally {
       setSubmitting(false);
     }
@@ -66,120 +67,124 @@ export default function Login() {
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <p className="text-sm font-semibold uppercase tracking-wider text-blue-700">User Wallet</p>
-        <h2 className="mt-3 text-2xl font-bold text-gray-900">Sign in to EthioCred</h2>
-        <p className="mt-2 text-sm text-gray-500">
-          Access your credentials and manage verification requests.
+      <div className="space-y-1 text-center sm:text-left">
+        <h2 className="text-2xl font-bold tracking-tight text-navy-950 font-display">
+          Sign In to Your Wallet
+        </h2>
+        <p className="text-sm text-slate-500">
+          Access your digital academic records and consent requests.
         </p>
       </div>
 
-      <div className="flex rounded-lg bg-gray-100 p-1">
+      {/* Tabs */}
+      <div className="flex rounded-xl bg-slate-100 p-1 border border-slate-200/80">
         <button
           type="button"
           onClick={() => { setActiveTab('email'); setError(''); }}
-          className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+          className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all duration-150 focus-ring ${
             activeTab === 'email'
-              ? 'bg-white text-blue-700 shadow-sm ring-1 ring-blue-600/20'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-white text-navy-950 shadow-soft'
+              : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          Email Login
+          <Mail size={15} />
+          <span>Email Login</span>
         </button>
         <button
           type="button"
           onClick={() => { setActiveTab('fayda'); setError(''); }}
-          className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+          className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all duration-150 focus-ring ${
             activeTab === 'fayda'
-              ? 'bg-white text-blue-700 shadow-sm ring-1 ring-blue-600/20'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-white text-navy-950 shadow-soft'
+              : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          Fayda ID Login
+          <Fingerprint size={15} />
+          <span>Fayda ID Login</span>
         </button>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <Alert variant="danger" onClose={() => setError('')}>
           {error}
-        </div>
+        </Alert>
       )}
 
       {activeTab === 'email' ? (
-        <form onSubmit={handleEmailSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
-              Email address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-              autoComplete="username"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <PasswordInput
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-              autoComplete="current-password"
-              placeholder="Enter your password"
-            />
-          </div>
-          <button
+        <form onSubmit={handleEmailSubmit} className="space-y-4">
+          <Input
+            id="email"
+            label="Email address"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="username"
+            placeholder="student@example.com"
+          />
+
+          <PasswordInput
+            id="password"
+            label="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            placeholder="Enter your password"
+          />
+
+          <Button
             type="submit"
-            disabled={submitting}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            variant="primary"
+            size="md"
+            className="w-full mt-2"
+            isLoading={submitting}
+            loadingText="Authenticating..."
+            rightIcon={LogIn}
           >
-            {submitting ? 'Signing in...' : 'Sign In'}
-          </button>
+            Sign In
+          </Button>
         </form>
       ) : (
-        <form onSubmit={handleFaydaSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="faydaId" className="mb-1 block text-sm font-medium text-gray-700">
-              Fayda ID
-            </label>
-            <input
-              id="faydaId"
-              type="text"
-              value={faydaId}
-              onChange={(e) => setFaydaId(e.target.value)}
-              placeholder="FAYDA-001"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 transition focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-          <button
+        <form onSubmit={handleFaydaSubmit} className="space-y-4">
+          <Input
+            id="faydaId"
+            label="National Fayda ID"
+            type="text"
+            value={faydaId}
+            onChange={(e) => setFaydaId(e.target.value)}
+            placeholder="FAYDA-001"
+            helperText="Enter your official Ethiopian National ID number."
+            required
+            autoFocus
+          />
+
+          <Button
             type="submit"
-            disabled={submitting}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            variant="primary"
+            size="md"
+            className="w-full mt-2"
+            isLoading={submitting}
+            loadingText="Verifying Fayda Identity..."
+            rightIcon={Fingerprint}
           >
-            {submitting ? 'Signing in...' : 'Sign In with Fayda'}
-          </button>
+            Sign In with Fayda
+          </Button>
         </form>
       )}
 
-      <p className="text-center text-sm text-gray-600">
-        New here?{' '}
-        <button
-          type="button"
-          onClick={() => { setShowRegister(true); setError(''); }}
-          className="font-medium text-blue-600 transition-colors hover:text-blue-700 focus:outline-none focus:underline"
-        >
-          Create your wallet
-        </button>
-      </p>
+      <div className="pt-4 border-t border-slate-100 text-center">
+        <p className="text-xs text-slate-500">
+          New student?{' '}
+          <button
+            type="button"
+            onClick={() => { setShowRegister(true); setError(''); }}
+            className="font-semibold text-navy-900 hover:underline focus-ring rounded"
+          >
+            Create your wallet
+          </button>
+        </p>
+      </div>
     </div>
   );
 }

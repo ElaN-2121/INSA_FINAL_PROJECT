@@ -2,30 +2,32 @@ import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
+  Users,
   ShieldCheck,
-  Send,
+  Search,
   History,
-  ListChecks,
+  FileClock,
   LogOut,
   Menu,
   X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
-import logo from '../assets/logo.png';
+import mark from '../assets/mark.png';
 
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+  { to: '/pipeline', label: 'Talent Pipeline', Icon: Users },
   { to: '/verify', label: 'Verify Credential', Icon: ShieldCheck },
-  { to: '/request', label: 'Request Verification', Icon: Send },
-  { to: '/history', label: 'History', Icon: History },
-  { to: '/request-status', label: 'Request Status', Icon: ListChecks },
+  { to: '/request', label: 'Request Verification', Icon: Search },
+  { to: '/request-status', label: 'Request Status', Icon: FileClock },
+  { to: '/history', label: 'Verification History', Icon: History },
 ];
 
 const linkClass = ({ isActive }) =>
-  `flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 focus-ring ${
     isActive
-      ? 'bg-blue-50 text-blue-700'
-      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+      ? 'bg-navy-900 text-white shadow-soft'
+      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
   }`;
 
 function getInitials(name) {
@@ -43,27 +45,32 @@ function getInitials(name) {
 export default function DashboardLayout() {
   const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const userName = user?.full_name || user?.email || 'User';
+  const userName = user?.full_name || user?.company_name || user?.email || 'Employer';
   const firstName = userName.split(' ')[0];
   const initials = getInitials(userName);
 
   const sidebarContent = (
     <>
-      <div className="px-5 py-6 border-b border-gray-200">
+      <div className="px-5 py-6 border-b border-slate-200/80">
         <div className="flex items-center gap-3">
           <img
-            src={logo}
-            alt="EthioCred logo"
-            className="h-10 w-10 rounded-lg object-contain"
+            src={mark}
+            alt="EthioCred"
+            className="h-10 w-10 rounded-xl object-contain p-0.5 bg-navy-50/50 border border-slate-200/80 shadow-soft"
           />
           <div>
-            <p className="text-base font-semibold text-gray-900 tracking-tight">EthioCred</p>
-            <p className="text-xs text-gray-500">Employer Portal</p>
+            <div className="flex items-center gap-2">
+              <span className="text-base font-bold text-navy-950 tracking-tight font-display">EthioCred</span>
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-teal-50 text-teal-800 border border-teal-200">
+                Verifier
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 font-medium">Employer Verification</p>
           </div>
         </div>
       </div>
 
-      <nav className="flex-1 px-4 py-6 space-y-1">
+      <nav className="flex-1 px-3 py-6 space-y-1">
         {navLinks.map(({ to, label, Icon }) => (
           <NavLink
             key={to}
@@ -75,7 +82,7 @@ export default function DashboardLayout() {
               <>
                 <Icon
                   size={18}
-                  className={`shrink-0 ${isActive ? 'text-blue-700' : 'text-gray-400'}`}
+                  className={`shrink-0 transition-colors ${isActive ? 'text-teal-400' : 'text-slate-400'}`}
                 />
                 <span>{label}</span>
               </>
@@ -84,14 +91,14 @@ export default function DashboardLayout() {
         ))}
       </nav>
 
-      <div className="px-5 py-5 border-t border-gray-200">
-        <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+      <div className="px-4 py-4 border-t border-slate-200/80 bg-slate-50/50">
+        <div className="flex items-center gap-3 rounded-xl bg-white border border-slate-200/80 p-3 shadow-soft">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-navy-900 text-xs font-bold text-white shadow-soft">
             {initials}
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-gray-900">{firstName}</p>
-            <p className="truncate text-xs text-gray-500">Employer</p>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-slate-900">{firstName}</p>
+            <p className="truncate text-xs text-slate-500">Verified Employer</p>
           </div>
         </div>
       </div>
@@ -99,18 +106,18 @@ export default function DashboardLayout() {
   );
 
   return (
-    <div className="min-h-screen flex bg-gray-50 text-gray-900">
+    <div className="min-h-screen flex bg-slate-50 text-slate-900 font-sans">
       {sidebarOpen && (
         <button
           type="button"
-          className="fixed inset-0 z-40 bg-gray-900/50 lg:hidden"
+          className="fixed inset-0 z-40 bg-navy-950/40 backdrop-blur-sm lg:hidden transition-opacity"
           onClick={() => setSidebarOpen(false)}
           aria-label="Close navigation menu"
         />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[280px] shrink-0 flex-col border-r border-gray-200 bg-white transition-transform duration-200 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[280px] shrink-0 flex-col border-r border-slate-200/80 bg-white shadow-soft transition-transform duration-200 lg:static lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -118,7 +125,7 @@ export default function DashboardLayout() {
           <button
             type="button"
             onClick={() => setSidebarOpen(false)}
-            className="rounded-lg p-2 text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus-ring"
             aria-label="Close navigation menu"
           >
             <X size={20} />
@@ -128,39 +135,41 @@ export default function DashboardLayout() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex flex-col gap-4 border-b border-gray-200 bg-white px-4 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+        <header className="sticky top-0 z-30 flex flex-col gap-3 border-b border-slate-200/80 bg-white/95 backdrop-blur px-4 py-3.5 sm:px-6 lg:flex-row lg:items-center lg:justify-between shadow-soft">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="rounded-lg p-2 text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 lg:hidden"
+              className="rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-ring lg:hidden"
               aria-label="Open navigation menu"
             >
               <Menu size={20} />
             </button>
             <div>
-              <p className="text-sm font-medium text-gray-500">Welcome back</p>
-              <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">Hello, {firstName}.</h1>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Employer Portal</p>
+              <h1 className="text-lg font-bold text-navy-950 font-display sm:text-xl">
+                Credential Verification Workspace
+              </h1>
             </div>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="inline-flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:inline-flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50/80 px-3.5 py-1.5 shadow-soft">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-navy-900 text-xs font-bold text-white">
                 {initials}
               </div>
-              <div className="truncate text-sm font-medium text-gray-700">{userName}</div>
+              <div className="truncate text-xs font-medium text-slate-700 max-w-[160px]">{userName}</div>
             </div>
             <button
               type="button"
               onClick={logout}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:border-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-700 focus-ring shadow-soft"
             >
-              <LogOut size={16} />
-              Logout
+              <LogOut size={15} />
+              <span>Logout</span>
             </button>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-4 sm:p-6">
+        <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>
       </div>
