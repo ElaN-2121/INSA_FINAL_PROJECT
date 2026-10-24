@@ -13,6 +13,7 @@ import StagingDashboard from '../pages/StagingDashboard/StagingDashboard.jsx';
 import IssuedCredentials from '../pages/IssuedCredentials/IssuedCredentials.jsx';
 import CredentialDetail from '../pages/CredentialDetail/CredentialDetail.jsx';
 import Settings from '../pages/Settings/Settings.jsx';
+import DepartmentInsights from '../pages/Insights/DepartmentInsights.jsx';
 
 const UNIVERSITY_ROLES = ['UNIVERSITY'];
 
@@ -55,6 +56,7 @@ export default function AppRoutes() {
         }
       >
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/insights" element={<DepartmentInsights />} />
         <Route path="/upload" element={<UploadBatch />} />
         <Route path="/staging/:batchId" element={<StagingDashboard />} />
         <Route path="/credentials" element={<IssuedCredentials />} />

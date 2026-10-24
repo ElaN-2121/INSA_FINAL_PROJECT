@@ -13,6 +13,7 @@ import Credentials from '../pages/Credentials/Credentials.jsx';
 import CredentialDetail from '../pages/CredentialDetail/CredentialDetail.jsx';
 import VerificationRequests from '../pages/VerificationRequests/VerificationRequests.jsx';
 import Notifications from '../pages/Notifications/Notifications.jsx';
+import ActivityCenter from '../pages/Activity/ActivityCenter.jsx';
 
 function LandingRoute() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -69,6 +70,7 @@ export default function AppRoutes() {
         <Route path="/credentials" element={<Credentials />} />
         <Route path="/credentials/:id" element={<CredentialDetail />} />
         <Route path="/requests" element={<VerificationRequests />} />
+        <Route path="/activity" element={<ActivityCenter />} />
         <Route path="/notifications" element={<Notifications />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

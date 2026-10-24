@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
+  BarChart3,
   Upload,
   FileCheck2,
   Settings,
@@ -14,6 +15,7 @@ import mark from '../assets/mark.png';
 
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+  { to: '/insights', label: 'Department Insights', Icon: BarChart3 },
   { to: '/upload', label: 'Upload Batch', Icon: Upload },
   { to: '/credentials', label: 'Issued Credentials', Icon: FileCheck2 },
   { to: '/settings', label: 'Settings', Icon: Settings },

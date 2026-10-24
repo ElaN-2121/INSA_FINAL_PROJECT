@@ -8,6 +8,7 @@ import {
   LogOut,
   Menu,
   X,
+  Activity,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import mark from '../assets/mark.png';
@@ -16,6 +17,7 @@ const navLinks = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { to: '/credentials', label: 'My Credentials', Icon: Wallet },
   { to: '/requests', label: 'Verification Requests', Icon: ShieldCheck },
+  { to: '/activity', label: 'Privacy & Activity', Icon: Activity },
   { to: '/notifications', label: 'Notifications', Icon: Bell },
 ];
 

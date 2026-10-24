@@ -11,9 +11,14 @@ import {
   QrCode,
   Bell,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Activity,
+  Lock,
+  Building2,
+  FileCheck2,
+  XCircle,
 } from 'lucide-react';
-import { get, formatDate } from '@ethiocred/utils';
+import { get, formatDate, formatDateTime } from '@ethiocred/utils';
 import { Badge, Loader, StatCard, Button, EmptyState } from '@ethiocred/ui';
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -29,7 +34,9 @@ export default function Dashboard() {
   const [profile, setProfile] = useState(user);
   const [credentials, setCredentials] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
+  const [activityData, setActivityData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activityLoading, setActivityLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -45,6 +52,11 @@ export default function Dashboard() {
       })
       .catch((err) => setError(err.response?.data?.message || 'Failed to load dashboard'))
       .finally(() => setLoading(false));
+
+    get('/analytics/student/activity')
+      .then((res) => setActivityData(res.data.data))
+      .catch((err) => console.error('Failed to load student activity analytics on dashboard', err))
+      .finally(() => setActivityLoading(false));
   }, []);
 
   const activeCredentials = useMemo(
@@ -59,6 +71,11 @@ export default function Dashboard() {
         .slice(0, 3),
     [credentials]
   );
+
+  const activityRequests = activityData?.requests_summary || {};
+  const activityVerifications = activityData?.verifications_summary || {};
+  const activityLogs = activityData?.access_log || [];
+  const recentActivityLogs = activityLogs.slice(0, 4);
 
   if (loading) {
     return (
@@ -187,6 +204,181 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Privacy & Activity Center Section */}
+      <div className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-display text-lg font-bold text-navy-950">
+                Privacy & Activity Center
+              </span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                Sovereign Audit Trail
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Live cryptographic audit trail of all third-party consent requests, student decisions, and employer verification checks
+            </p>
+          </div>
+          <Link
+            to="/activity"
+            className="inline-flex items-center gap-1 text-xs font-bold text-navy-800 hover:text-navy-950 transition-colors shrink-0"
+          >
+            Explore Full Activity Center
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        {/* Mini stats row */}
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-1">
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Consent Requests
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-navy-950 font-display">
+                {activityLoading ? '...' : (activityRequests.received ?? 0)}
+              </span>
+              <span className="text-xs text-slate-500 font-medium">
+                {activityRequests.approved ?? 0} approved
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Approval Rate
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-emerald-700 font-display">
+                {activityLoading ? '...' : `${activityRequests.approval_rate ?? 0}%`}
+              </span>
+              <span className="text-xs text-slate-500 font-medium">
+                selective sharing
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Verifications Run
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-navy-900 font-display">
+                {activityLoading ? '...' : (activityVerifications.total_verifications ?? 0)}
+              </span>
+              <span className="text-xs text-emerald-700 font-medium">
+                {activityVerifications.valid_verifications ?? 0} valid checks
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Credential Health
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-emerald-800 font-display">
+                {activityLoading ? '...' : `${activeCredentials.length} / ${credentials.length}`}
+              </span>
+              <span className="text-xs text-slate-500 font-medium">
+                active in registry
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Audit Log Preview Feed */}
+        <div className="pt-2">
+          <div className="flex items-center justify-between pb-3">
+            <span className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+              Recent Access & Verification Events
+            </span>
+            <Link
+              to="/activity"
+              className="text-xs text-slate-500 hover:text-navy-900 font-medium"
+            >
+              View all ({activityLogs.length})
+            </Link>
+          </div>
+
+          {activityLoading ? (
+            <div className="space-y-3">
+              <div className="h-12 bg-slate-100 rounded-lg animate-pulse" />
+              <div className="h-12 bg-slate-100 rounded-lg animate-pulse" />
+            </div>
+          ) : recentActivityLogs.length === 0 ? (
+            <p className="text-xs text-slate-500 italic py-2">
+              No recent third-party access events recorded.
+            </p>
+          ) : (
+            <div className="divide-y divide-slate-100 border border-slate-100 rounded-xl overflow-hidden">
+              {recentActivityLogs.map((log) => {
+                const isVerification = log.event_type === 'VERIFICATION_CHECK';
+                const isApprovedOrValid = ['APPROVED', 'VALID', 'COMPLETED'].includes(log.status);
+                const isPending = log.status === 'PENDING';
+
+                return (
+                  <div
+                    key={log.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 hover:bg-slate-50/70 transition-colors"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`p-2 rounded-lg shrink-0 ${
+                          isVerification
+                            ? 'bg-navy-50 text-navy-800'
+                            : 'bg-emerald-50 text-emerald-800'
+                        }`}
+                      >
+                        {isVerification ? <FileCheck2 size={16} /> : <ShieldCheck size={16} />}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-xs text-slate-900">
+                            {log.employer_company}
+                          </span>
+                          <span className="text-[11px] text-slate-500">
+                            · {log.action_description}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 font-mono mt-0.5 truncate">
+                          {log.degree_name} ({log.serial_number})
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                      <span className="text-[11px] text-slate-400">
+                        {formatDateTime(log.requested_at)}
+                      </span>
+                      {isApprovedOrValid && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                          <CheckCircle2 size={11} className="text-emerald-600" />
+                          {log.status}
+                        </span>
+                      )}
+                      {isPending && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                          <Clock size={11} className="text-amber-600" />
+                          PENDING
+                        </span>
+                      )}
+                      {!isApprovedOrValid && !isPending && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+                          <XCircle size={11} className="text-rose-600" />
+                          {log.status}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Recent Credentials Grid */}
       <div className="space-y-4">

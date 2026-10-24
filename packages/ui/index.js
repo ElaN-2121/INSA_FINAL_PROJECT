@@ -27,3 +27,11 @@ export { default as PageHeader } from './src/PageHeader.jsx';
 export { default as StatCard } from './src/StatCard.jsx';
 export { default as Stepper, Timeline } from './src/Stepper.jsx';
 export { default as AppShell } from './src/AppShell.jsx';
+
+// Data visualization and accessible charts
+export { default as BarList } from './src/BarList.jsx';
+export { default as Sparkline } from './src/Sparkline.jsx';
+export { default as TrendChart } from './src/TrendChart.jsx';
+export { default as StackedBar } from './src/StackedBar.jsx';
+export { default as Donut } from './src/Donut.jsx';
+

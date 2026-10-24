@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard,
+  Users,
   ShieldCheck,
   Search,
   History,
@@ -15,6 +16,7 @@ import mark from '../assets/mark.png';
 
 const navLinks = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+  { to: '/pipeline', label: 'Talent Pipeline', Icon: Users },
   { to: '/verify', label: 'Verify Credential', Icon: ShieldCheck },
   { to: '/request', label: 'Request Verification', Icon: Search },
   { to: '/request-status', label: 'Request Status', Icon: FileClock },

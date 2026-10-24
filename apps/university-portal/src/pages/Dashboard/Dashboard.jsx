@@ -11,10 +11,28 @@ import {
   Building2,
   FileText,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  BarChart3,
+  TrendingUp
 } from 'lucide-react';
 import { get, formatDate } from '@ethiocred/utils';
-import { Badge, Loader, Table, StatCard, Button, EmptyState, PageHeader } from '@ethiocred/ui';
+import {
+  Badge,
+  Loader,
+  Table,
+  StatCard,
+  Button,
+  EmptyState,
+  PageHeader,
+  BarList,
+  TrendChart,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  Skeleton
+} from '@ethiocred/ui';
 
 function statusBadge(status) {
   if (status === 'ACTIVE') return <Badge variant="green">ACTIVE</Badge>;
@@ -26,6 +44,10 @@ export default function Dashboard() {
   const [credentials, setCredentials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [trendData, setTrendData] = useState([]);
+  const [selectedDeptForTrend, setSelectedDeptForTrend] = useState('ALL');
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,7 +55,25 @@ export default function Dashboard() {
       .then(({ data }) => setCredentials(data.data || []))
       .catch((err) => setError(err.response?.data?.message || 'Failed to load credentials'))
       .finally(() => setLoading(false));
+
+    // Fetch department analytics
+    get('/analytics/university/departments')
+      .then((res) => setAnalyticsData(res.data.data))
+      .catch((err) => console.error('Failed to load department analytics on dashboard', err));
   }, []);
+
+  // Fetch trend when selected department changes
+  useEffect(() => {
+    setAnalyticsLoading(true);
+    const query = selectedDeptForTrend && selectedDeptForTrend !== 'ALL'
+      ? `?department=${encodeURIComponent(selectedDeptForTrend)}`
+      : '';
+
+    get(`/analytics/university/trend${query}`)
+      .then((res) => setTrendData(res.data.data.trend || []))
+      .catch((err) => console.error('Failed to load trend analytics on dashboard', err))
+      .finally(() => setAnalyticsLoading(false));
+  }, [selectedDeptForTrend]);
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -60,6 +100,22 @@ export default function Dashboard() {
         .slice(0, 8),
     [credentials]
   );
+
+  const departments = analyticsData?.departments || [];
+  const highlights = analyticsData?.highlights || {};
+
+  const barListData = useMemo(() => {
+    return [...departments]
+      .sort((a, b) => b.times_verified - a.times_verified)
+      .slice(0, 5)
+      .map((d) => ({
+        label: d.department,
+        value: d.times_verified,
+        valueDisplay: d.times_verified_display,
+        sublabel: `${d.credentials_issued_display} issued`,
+        color: d.verification_success_rate < 85 ? 'bg-amber-600' : 'bg-navy-700',
+      }));
+  }, [departments]);
 
   const columns = [
     {
@@ -177,6 +233,143 @@ export default function Dashboard() {
           icon={Calendar}
           helpText="Current academic cycle"
         />
+      </div>
+
+      {/* Department Insights Section */}
+      <div className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-display text-lg font-bold text-navy-950">
+                Department Insights
+              </span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-navy-50 text-navy-800 border border-navy-200">
+                Live Analytics
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Employer verification demand, academic major trends, and credential cryptographic validation health
+            </p>
+          </div>
+          <Link
+            to="/insights"
+            className="inline-flex items-center gap-1 text-xs font-bold text-navy-800 hover:text-navy-950 transition-colors shrink-0"
+          >
+            Explore Department Insights Hub
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        {/* 3 Highlights */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+          {/* Highlight 1 */}
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Most Verified Department
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-base font-bold text-navy-950 font-display">
+                {highlights.most_verified?.department || '—'}
+              </span>
+              {highlights.most_verified && (
+                <span className="text-xs font-mono font-semibold text-navy-700">
+                  ({highlights.most_verified.times_verified} queries)
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Highlight 2 */}
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Highest Student Consent
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-base font-bold text-emerald-800 font-display">
+                {highlights.highest_approval?.department || '—'}
+              </span>
+              {highlights.highest_approval && (
+                <span className="text-xs font-mono font-semibold text-emerald-700">
+                  ({highlights.highest_approval.approval_rate}% approved)
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Highlight 3 */}
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Needs Attention
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              {highlights.needs_attention ? (
+                <>
+                  <span className="text-base font-bold text-amber-900 font-display">
+                    {highlights.needs_attention.department}
+                  </span>
+                  <span className="text-xs font-mono font-semibold text-amber-700">
+                    ({highlights.needs_attention.issue || `${highlights.needs_attention.revoked || 0} revoked`})
+                  </span>
+                </>
+              ) : (
+                <span className="text-xs font-medium text-emerald-700">
+                  All departments healthy
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Visualizations: Ranked List + Verification Trend */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 pt-2">
+          {/* Top Departments */}
+          <div className="lg:col-span-2 space-y-2 border border-slate-100 rounded-xl p-4 bg-slate-50/30">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-3 flex items-center gap-1.5">
+              <BarChart3 size={14} className="text-navy-700" />
+              <span>Ranked by Verification Volume</span>
+            </h4>
+            <BarList
+              data={barListData}
+              isLoading={!analyticsData}
+              emptyTitle="No departments found"
+              emptyMessage="No verification records yet."
+              barColor="bg-navy-800"
+            />
+          </div>
+
+          {/* Trend Chart Preview */}
+          <div className="lg:col-span-3 space-y-2 border border-slate-100 rounded-xl p-4">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                <TrendingUp size={14} className="text-navy-700" />
+                <span>Verification Trend</span>
+              </h4>
+              <select
+                value={selectedDeptForTrend}
+                onChange={(e) => setSelectedDeptForTrend(e.target.value)}
+                className="text-xs font-medium rounded-lg border border-slate-200 bg-white px-2 py-1 text-slate-700 focus-ring"
+                aria-label="Filter dashboard trend by department"
+              >
+                <option value="ALL">All Departments</option>
+                {departments.map((d) => (
+                  <option key={d.department} value={d.department}>
+                    {d.department}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <TrendChart
+              data={trendData}
+              height={190}
+              primaryColor="#16345E"
+              secondaryColor="#16A34A"
+              primaryLabel="Total"
+              secondaryLabel="Valid"
+              showSecondary={true}
+              isLoading={analyticsLoading}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Quick Launchpad Banner */}

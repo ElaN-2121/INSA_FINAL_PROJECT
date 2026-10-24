@@ -11,16 +11,37 @@ import {
   AlertTriangle,
   Send,
   Building2,
-  AlertCircle
+  AlertCircle,
+  Users,
+  Clock,
+  TrendingUp,
 } from 'lucide-react';
 import { get, formatDateTime } from '@ethiocred/utils';
-import { Badge, Loader, Table, StatCard, Button, EmptyState, PageHeader } from '@ethiocred/ui';
+import {
+  Badge,
+  Loader,
+  Table,
+  StatCard,
+  Button,
+  EmptyState,
+  PageHeader,
+  BarList,
+  TrendChart,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  Skeleton
+} from '@ethiocred/ui';
 import { getVerificationResults } from '../../utils/verificationCache.js';
 
 export default function Dashboard() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pipelineData, setPipelineData] = useState(null);
+  const [pipelineLoading, setPipelineLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +49,11 @@ export default function Dashboard() {
       .then(({ data }) => setHistory(data.data || []))
       .catch((err) => setError(err.response?.data?.message || 'Failed to load history'))
       .finally(() => setLoading(false));
+
+    get('/analytics/employer/candidates')
+      .then((res) => setPipelineData(res.data.data))
+      .catch((err) => console.error('Failed to load candidate analytics on dashboard', err))
+      .finally(() => setPipelineLoading(false));
   }, []);
 
   const results = getVerificationResults();
@@ -40,6 +66,20 @@ export default function Dashboard() {
   }), [results, history]);
 
   const recentResults = results.slice(0, 8);
+
+  const pipelineTotals = pipelineData?.pipeline_totals || {};
+  const pipelineUniversities = pipelineData?.universities || [];
+  const pipelineTrend = pipelineData?.monthly_trend || [];
+
+  const universityBarList = useMemo(() => {
+    return pipelineUniversities.slice(0, 5).map((u) => ({
+      label: u.institution_name,
+      value: u.approved_candidates,
+      valueDisplay: `${u.approved_candidates} approved`,
+      sublabel: `${u.total_requests} requests (${u.share_percentage}% share)`,
+      color: 'bg-navy-700',
+    }));
+  }, [pipelineUniversities]);
 
   const columns = [
     {
@@ -162,6 +202,133 @@ export default function Dashboard() {
         <p className="text-right text-xs text-slate-500 font-medium pr-1">
           Counts reflect this browser session.
         </p>
+      </div>
+
+      {/* Talent Pipeline Section */}
+      <div className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-display text-lg font-bold text-navy-950">
+                Talent Pipeline
+              </span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                Candidate Insights
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Candidate consent throughput, institutional sourcing channels, and monthly applicant volumes
+            </p>
+          </div>
+          <Link
+            to="/pipeline"
+            className="inline-flex items-center gap-1 text-xs font-bold text-navy-800 hover:text-navy-950 transition-colors shrink-0"
+          >
+            Explore Full Pipeline Hub
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        {/* Pipeline Stat Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-1">
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Approved Candidates
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-navy-950 font-display">
+                {pipelineLoading ? '...' : (pipelineTotals.approved_candidates ?? 0)}
+              </span>
+              <span className="text-xs text-emerald-700 font-semibold">
+                ready to verify
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Pending Consent
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-amber-700 font-display">
+                {pipelineLoading ? '...' : (pipelineTotals.pending_requests ?? 0)}
+              </span>
+              <span className="text-xs text-slate-500 font-medium">
+                in student wallet
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Approval Rate
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-emerald-800 font-display">
+                {pipelineLoading ? '...' : `${pipelineTotals.approval_rate ?? 0}%`}
+              </span>
+              <span className="text-xs text-slate-500 font-medium">
+                across requests
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Avg Time to Approval
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-slate-800 font-display">
+                {pipelineLoading ? '...' : (pipelineTotals.avg_time_to_approval_display || 'N/A')}
+              </span>
+              <span className="text-xs text-slate-400 font-medium">
+                response latency
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Visualizations: University Sourcing + Monthly Trend */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 pt-2">
+          {/* Sourcing Breakdown */}
+          <div className="lg:col-span-2 space-y-2 border border-slate-100 rounded-xl p-4 bg-slate-50/30">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-3 flex items-center gap-1.5">
+              <Building2 size={14} className="text-navy-700" />
+              <span>University Sourcing Channels</span>
+            </h4>
+            <BarList
+              data={universityBarList}
+              isLoading={pipelineLoading}
+              emptyTitle="No sourcing records"
+              emptyMessage="No candidate requests sent across universities."
+              barColor="bg-navy-800"
+            />
+          </div>
+
+          {/* Monthly Trend Preview */}
+          <div className="lg:col-span-3 space-y-2 border border-slate-100 rounded-xl p-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
+              <TrendingUp size={14} className="text-navy-700" />
+              <span>Candidate Consent Trend (Last 6 Months)</span>
+            </h4>
+            <TrendChart
+              data={pipelineTrend.map((m) => ({
+                label: m.period_label,
+                value: m.requests_sent,
+                secondaryValue: m.approved,
+              }))}
+              height={190}
+              primaryColor="#16345E"
+              secondaryColor="#16A34A"
+              primaryLabel="Requests Sent"
+              secondaryLabel="Approved"
+              showSecondary={true}
+              isLoading={pipelineLoading}
+              emptyTitle="No trend recorded"
+              emptyMessage="No candidate pipeline activity in the last 6 months."
+            />
+          </div>
+        </div>
       </div>
 
       {/* Quick Launchpad Cards */}
