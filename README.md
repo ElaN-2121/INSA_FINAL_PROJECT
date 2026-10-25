@@ -1,12 +1,12 @@
 # EthioCred – Secure Digital Academic Credential Platform
 
-## Group Members
-1. Abebaye Agumassie - Backend Developer
-2. Dawit Asres - Frontend Developer
-3. Elnathan Nigussie - Backend Developer and Project Manager
+## Group Member Roles
+1. Abebaye Agumassie - Backend Developer: Verification Engine & Trust Model
+2. Dawit Asres - Portals & Security Demonstrations
+3. Elnathan Nigussie - Backend Developer & Project Manager: Database, Authentication & Cryptography
 
 ## Demo Video
-https://youtu.be/7kM6De6pNjA
+https://youtu.be/6tStXxiLBnw
 
 ## Quick Start
 
