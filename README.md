@@ -5,6 +5,9 @@
 2. Dawit Asres - Frontend Developer
 3. Elnathan Nigussie - Backend Developer and Project Manager
 
+## Demo Video
+https://youtu.be/7kM6De6pNjA
+
 ## Quick Start
 
 ### 1. Install dependencies
